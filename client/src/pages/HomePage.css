@@ -1,0 +1,22 @@
+.home-page__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.home-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 1024px) {
+  .home-page__layout {
+    flex-direction: row;
+  }
+  .home-page > .home-page__layout > :first-child {
+    flex: 0 0 240px;
+  }
+  .home-page__list {
+    flex: 1;
+  }
+}

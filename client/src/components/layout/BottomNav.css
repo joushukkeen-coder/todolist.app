@@ -1,0 +1,29 @@
+.app-bottom-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e9ecef;
+  z-index: 100;
+}
+
+@media (min-width: 1024px) {
+  .app-bottom-nav {
+    display: none;
+  }
+}
+
+.app-bottom-nav__link {
+  flex: 1;
+  padding: 12px 0;
+  text-align: center;
+  color: #495057;
+  text-decoration: none;
+  font-size: 12px;
+}
+.app-bottom-nav__link--active {
+  color: #4a90d9;
+  font-weight: 600;
+}

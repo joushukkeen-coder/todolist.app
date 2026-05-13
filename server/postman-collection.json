@@ -1,0 +1,133 @@
+{
+  "info": {
+    "name": "TodoListApp API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "BE-15 산출물 - Auth, Users, Categories, Todos REST API"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "todoId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password1\",\n  \"name\": \"테스터\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password1\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/users/me",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"새이름\"\n}" }
+          }
+        },
+        {
+          "name": "Delete account",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/users/me" }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        { "name": "List", "request": { "method": "GET", "url": "{{baseUrl}}/categories" } },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/categories",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"새카테고리\",\n  \"colorCode\": \"#A1B2C3\"\n}" }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/categories/{{categoryId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"수정\"\n}" }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/categories/{{categoryId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Todos",
+      "item": [
+        {
+          "name": "List (with filters)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/todos?categoryId=&isCompleted=&dueDateFrom=&dueDateTo=",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"],
+              "query": [
+                { "key": "categoryId", "value": "" },
+                { "key": "isCompleted", "value": "" },
+                { "key": "dueDateFrom", "value": "" },
+                { "key": "dueDateTo", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/todos",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"할일 제목\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"description\": null,\n  \"dueDate\": null\n}" }
+          }
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/todos/{{todoId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"수정됨\"\n}" }
+          }
+        },
+        { "name": "Complete", "request": { "method": "PATCH", "url": "{{baseUrl}}/todos/{{todoId}}/complete" } },
+        { "name": "Reopen", "request": { "method": "PATCH", "url": "{{baseUrl}}/todos/{{todoId}}/reopen" } },
+        { "name": "Delete", "request": { "method": "DELETE", "url": "{{baseUrl}}/todos/{{todoId}}" } }
+      ]
+    }
+  ]
+}

@@ -8,20 +8,20 @@
 
 ## 변경 이력
 
-| 버전 | 날짜 | 작성자 | 변경 내용 |
-|------|------|--------|-----------|
+| 버전  | 날짜       | 작성자      | 변경 내용                                             |
+| ----- | ---------- | ----------- | ----------------------------------------------------- |
 | 2.0.0 | 2026-05-13 | joushukkeen | DB·백엔드·프론트엔드 3개 도메인 병렬 분석 기반 재작성 |
 
 ---
 
 ## 1. 전체 개요
 
-| 도메인 | 태스크 수 | 태스크 ID 범위 |
-|--------|-----------|---------------|
-| 데이터베이스 | 8 | DB-01 ~ DB-08 |
-| 백엔드 | 15 | BE-01 ~ BE-15 |
-| 프론트엔드 | 12 | FE-01 ~ FE-12 |
-| **합계** | **35** | |
+| 도메인       | 태스크 수 | 태스크 ID 범위 |
+| ------------ | --------- | -------------- |
+| 데이터베이스 | 8         | DB-01 ~ DB-08  |
+| 백엔드       | 15        | BE-01 ~ BE-15  |
+| 프론트엔드   | 12        | FE-01 ~ FE-12  |
+| **합계**     | **35**    |                |
 
 ### 핵심 제약 사항
 
@@ -41,6 +41,7 @@
 **의존성**: 없음
 
 **완료 조건**:
+
 - [x] `psql --version` 명령 실행 시 `psql (PostgreSQL) 17.x` 출력 확인
 - [x] `todolistapp_dev` 데이터베이스 생성 후 `psql -l` 목록에 표시 확인
 - [x] 전용 DB 사용자(`todoapp_user`) 생성 후 CONNECT·CREATE 권한 부여 확인
@@ -55,6 +56,7 @@
 **의존성**: DB-01
 
 **완료 조건**:
+
 - [x] `server/.env.development`에 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` 키 모두 존재
 - [x] `server/.env.example`에 동일 키가 플레이스홀더로 기재됨
 - [x] `.gitignore`에 `.env.development`, `.env.production` 등록되어 `git status`에서 추적 제외
@@ -69,6 +71,7 @@
 **의존성**: DB-01, DB-02
 
 **완료 조건**:
+
 - [x] `psql -U todoapp_user -d todolistapp_dev -f database/schema.sql` 실행이 오류 없이 완료
 - [x] `\dt` 명령으로 `users`, `categories`, `todos` 테이블 3개 확인
 - [x] `SELECT extname FROM pg_extension WHERE extname = 'pgcrypto';` 결과 1행 확인
@@ -83,6 +86,7 @@
 **의존성**: DB-03
 
 **완료 조건**:
+
 - [x] `users.email` UNIQUE 위반 INSERT 시 `duplicate key value` 오류 발생
 - [x] 존재하지 않는 `user_id`로 categories INSERT 시 FK 위반 오류 발생
 - [x] `users` 행 DELETE 시 연결된 todos가 `ON DELETE CASCADE`로 자동 삭제 확인
@@ -98,6 +102,7 @@
 **의존성**: DB-03
 
 **완료 조건**:
+
 - [x] `SELECT name, color_code, is_default, user_id FROM categories ORDER BY name;` 결과 3행 반환
 - [x] `개인 / #4A90D9 / TRUE / NULL`, `업무 / #E8503A / TRUE / NULL`, `쇼핑 / #2ECC71 / TRUE / NULL` 값 일치
 - [x] 모든 기본 카테고리의 `user_id`가 NULL
@@ -112,6 +117,7 @@
 **의존성**: DB-03
 
 **완료 조건**:
+
 - [x] `pg_indexes` 조회 결과에 `idx_todos_user_id`, `idx_todos_category_id`, `idx_todos_is_completed`, `idx_todos_due_date`, `idx_categories_user_id` 5개 모두 포함
 - [x] `idx_todos_due_date`가 부분 인덱스(`WHERE due_date IS NOT NULL`)로 생성
 - [x] 테스트 데이터 삽입 후 `EXPLAIN SELECT * FROM todos WHERE user_id = $1` 결과에 `Index Scan` 포함
@@ -124,6 +130,7 @@
 **의존성**: DB-03, DB-05
 
 **완료 조건**:
+
 - [x] users 테스트 행 INSERT 후 1초 경과한 뒤 UPDATE 실행 시 `updated_at > created_at` 확인
 - [x] todos 테이블에서 동일 방식으로 트리거 동작 확인
 - [x] `\d+ users`, `\d+ todos` 출력에 `trg_users_updated_at`, `trg_todos_updated_at` 트리거 이름 확인
@@ -137,6 +144,7 @@
 **의존성**: DB-02, DB-03
 
 **완료 조건**:
+
 - [x] `server/src/db/pool.js`에 `pg.Pool` 인스턴스가 생성되고 단일 인스턴스로 export
 - [x] `max`, `idleTimeoutMillis`, `connectionTimeoutMillis` 옵션 명시
 - [x] 연결 정보는 `config/env.js`를 통해 주입되며 하드코딩 없음
@@ -154,6 +162,7 @@
 **의존성**: 없음
 
 **완료 조건**:
+
 - [x] `server/package.json` 생성, 모듈 시스템 결정 명시
 - [x] 의존성 설치: `express`, `pg`, `bcrypt`, `jsonwebtoken`, `dotenv`, `cors`, `morgan`
 - [x] 개발 의존성 설치: `jest`, `supertest`, `nodemon`
@@ -174,6 +183,7 @@
 **의존성**: BE-01
 
 **완료 조건**:
+
 - [x] `server/src/db/pool.js`에 `pg.Pool` 인스턴스 생성 및 export
 - [x] 풀 설정값(`max`, `idleTimeoutMillis`, `connectionTimeoutMillis`) 명시
 - [x] DB 연결 정보를 `config/env.js`에서 가져옴 (하드코딩 금지)
@@ -189,6 +199,7 @@
 **의존성**: BE-01
 
 **완료 조건**:
+
 - [x] `utils/AppError.js`: `code`, `statusCode`, `message`를 인자로 받는 커스텀 Error 클래스
 - [x] `utils/jwt.js`: `signToken(payload)`, `verifyToken(token)` 함수, `JWT_EXPIRES_IN` 환경 변수 적용
 - [x] `utils/hash.js`: `hashPassword` (salt rounds ≥ 10), `comparePassword` 함수
@@ -211,6 +222,7 @@
 **의존성**: BE-03
 
 **완료 조건**:
+
 - [x] `middlewares/validate.js`가 검증 스키마를 받아 미들웨어를 반환하는 팩토리 함수
 - [x] 검증 실패 시 HTTP 400 / `VALIDATION_ERROR`, 실패 사유를 message에 포함
 - [x] 다음 규칙 검증 가능: 이메일 형식, 비밀번호 ≥8자, 제목 1~200자, `#RRGGBB` 색상 코드, UUID
@@ -224,6 +236,7 @@
 **의존성**: BE-02, BE-03, BE-04, DB-08
 
 **완료 조건**:
+
 - [x] 라우트 `POST /api/v1/auth/register` (인증 미들웨어 미적용)
 - [x] 정상 응답 HTTP **201 Created**, 응답에 `userId`, `email`, `name`, `createdAt` 포함
 - [x] 이메일 중복 시 HTTP 409 / `EMAIL_ALREADY_EXISTS` (BR-U-01)
@@ -242,6 +255,7 @@
 **의존성**: BE-02, BE-03, BE-04, DB-08
 
 **완료 조건**:
+
 - [x] 라우트 `POST /api/v1/auth/login` (인증 미들웨어 미적용)
 - [x] 정상 응답 HTTP **200 OK**, `accessToken`과 `user` 객체 반환
 - [x] 이메일 미존재·비밀번호 불일치 모두 HTTP 401 / `INVALID_CREDENTIALS` (사용자 열거 방지)
@@ -257,6 +271,7 @@
 **의존성**: BE-03, BE-04, BE-05
 
 **완료 조건**:
+
 - [x] 라우트 `PATCH /api/v1/users/me` (JWT 인증 미들웨어 적용)
 - [x] 정상 응답 HTTP **200 OK**, 갱신된 user 객체 반환
 - [x] 이메일 변경 요청 시 HTTP 400 / `EMAIL_CHANGE_NOT_ALLOWED`
@@ -275,6 +290,7 @@
 **의존성**: BE-03, BE-05
 
 **완료 조건**:
+
 - [x] 라우트 `DELETE /api/v1/users/me` (JWT 인증 미들웨어 적용)
 - [x] 정상 응답 HTTP **204 No Content** (바디 없음)
 - [x] 해당 사용자의 todos, categories(`user_id = userId`), users 레코드 모두 삭제 (DB CASCADE 활용 또는 명시적 순서)
@@ -290,6 +306,7 @@
 **의존성**: BE-03, BE-04
 
 **완료 조건**:
+
 - [x] 두 엔드포인트 모두 JWT 인증 미들웨어 적용
 - [x] `GET` 정상 응답 HTTP **200 OK**, 기본 카테고리(`is_default = true`) + 본인 소유 카테고리만 반환
 - [x] 타 사용자의 카테고리는 응답에 미포함
@@ -307,6 +324,7 @@
 **의존성**: BE-03, BE-04, BE-09
 
 **완료 조건**:
+
 - [x] 두 엔드포인트 모두 JWT 인증 미들웨어 적용
 - [x] `PATCH` 정상 응답 HTTP **200 OK**
 - [x] `is_default = true` 카테고리 수정 시도 시 HTTP 403 / `DEFAULT_CATEGORY_IMMUTABLE` (BR-C-01)
@@ -326,6 +344,7 @@
 **의존성**: BE-03, BE-04, BE-09
 
 **완료 조건**:
+
 - [x] 두 엔드포인트 모두 JWT 인증 미들웨어 적용
 - [x] `POST` 정상 응답 HTTP **201 Created**, 생성된 todo 객체 반환
 - [x] `title` 누락·빈 문자열·200자 초과 시 HTTP 400 / `VALIDATION_ERROR` (BR-T-01)
@@ -344,6 +363,7 @@
 **의존성**: BE-03, BE-04, BE-11
 
 **완료 조건**:
+
 - [x] 두 엔드포인트 모두 JWT 인증 미들웨어 적용
 - [x] `PATCH` 정상 응답 HTTP **200 OK**, 수정된 todo 객체 반환
 - [x] 존재하지 않는 todoId 시 HTTP 404 / `TODO_NOT_FOUND`
@@ -363,6 +383,7 @@
 **의존성**: BE-03, BE-11
 
 **완료 조건**:
+
 - [x] 두 엔드포인트 모두 JWT 인증 미들웨어 적용
 - [x] `/complete` 정상 응답 HTTP **200 OK**, `is_completed = true`, `completed_at = NOW()` 업데이트
 - [x] `/reopen` 정상 응답 HTTP **200 OK**, `is_completed = false`, `completed_at = NULL` 업데이트 (BR-T-03)
@@ -379,6 +400,7 @@
 **의존성**: BE-11
 
 **완료 조건**:
+
 - [x] 쿼리 파라미터 지원: `categoryId`(UUID), `isCompleted`(boolean), `dueDateFrom`/`dueDateTo`(ISO 8601 date)
 - [x] 정상 응답 HTTP **200 OK**, 필터링된 목록 반환
 - [x] 복합 조건은 AND로 결합 (BR-F-01)
@@ -396,6 +418,7 @@
 **의존성**: BE-05 ~ BE-14
 
 **완료 조건**:
+
 - [x] `jest` + `supertest` 설정 완료 (`npm test` 동작)
 - [x] 통합 테스트용 별도 DB 설정 (`.env.test` 또는 `globalSetup`/`globalTeardown`)
 - [x] 각 테스트 전후 테이블 초기화·정리
@@ -416,6 +439,7 @@
 **의존성**: 없음
 
 **완료 조건**:
+
 - [x] `client/src/` 하위에 `pages/`, `components/common/`, `components/todo/`, `components/category/`, `components/layout/`, `hooks/`, `services/`, `store/`, `query-keys/`, `types/`, `utils/`, `router/` 모두 생성
 - [x] `vite.config.ts`에 경로 별칭(`@/` → `src/`) 설정
 - [x] `tsconfig.json`에 `strict`, `noImplicitAny`, `strictNullChecks`, `noUncheckedIndexedAccess` 활성화
@@ -433,6 +457,7 @@
 **의존성**: FE-01
 
 **완료 조건**:
+
 - [x] `types/auth.types.ts`, `todo.types.ts`, `category.types.ts`, `api.types.ts` 작성 (camelCase 반영)
 - [x] `services/apiClient.ts`의 axios 인스턴스가 `VITE_API_BASE_URL` 사용
 - [x] 요청 인터셉터: `authStore` 토큰을 `Authorization: Bearer <token>`로 자동 주입
@@ -451,6 +476,7 @@
 **의존성**: FE-02
 
 **완료 조건**:
+
 - [x] `router/index.tsx`에 공개 라우트(`/login`, `/register`)·보호 라우트(`/`, `/categories`, `/profile`) 분리 정의
 - [x] 라우트 경로 문자열 상수화 (하드코딩 없음)
 - [x] `PrivateRoute`가 `authStore` 토큰 유무로 미인증 시 `<Navigate to="/login" />`
@@ -466,6 +492,7 @@
 **의존성**: FE-01
 
 **완료 조건**:
+
 - [x] `Button.tsx`: `variant`(primary/secondary/danger), `size`, `disabled`, `isLoading` props, 로딩 시 Spinner 표시·클릭 비활성화
 - [x] `Input.tsx`: `label`, `error`, `type`, `value`, `onChange` props, error 전달 시 에러 스타일·메시지 표시
 - [x] `Modal.tsx`: `isOpen`, `onClose`, `title`, `children` props, 오버레이 클릭·ESC 키로 닫힘
@@ -482,6 +509,7 @@
 **의존성**: FE-03, FE-04
 
 **완료 조건**:
+
 - [x] `Header.tsx`: 앱 이름·로그인 사용자 이름·로그아웃 버튼 포함
 - [x] `Sidebar.tsx`: ≥1024px에서만 표시, 할일·카테고리·프로필 네비게이션 링크 포함
 - [x] `BottomNav.tsx`: <1024px에서만 표시, 동일 기능을 하단 탭 형태로 제공
@@ -498,6 +526,7 @@
 **의존성**: FE-03, FE-04, BE-05, BE-06
 
 **완료 조건**:
+
 - [x] `LoginPage.tsx`: 이메일·비밀번호 입력, 로그인 버튼, 회원가입 페이지 링크
 - [x] `RegisterPage.tsx`: 이메일·비밀번호·이름 입력, 회원가입 버튼, 로그인 페이지 링크
 - [x] 비밀번호 8자 이상·이메일 형식 클라이언트 검증, 미충족 시 Input 하단 에러 표시
@@ -516,6 +545,7 @@
 **의존성**: FE-05, BE-07, BE-08
 
 **완료 조건**:
+
 - [x] `ProfilePage.tsx`: 이메일(읽기 전용), 이름 변경, 비밀번호 변경(현재/신규), 저장 버튼
 - [x] 이메일 필드는 disabled 처리
 - [x] 변경된 항목만 API 요청에 포함
@@ -535,6 +565,7 @@
 **의존성**: FE-05, BE-09, BE-10
 
 **완료 조건**:
+
 - [x] `CategoryPage.tsx`: 기본 카테고리(개인/업무/쇼핑)와 사용자 정의 카테고리 구분 표시
 - [x] 기본 카테고리는 수정·삭제 버튼 비활성화 또는 숨김 (BR-C-01)
 - [x] `CategoryForm.tsx`: 이름·색상 코드 입력, `Modal`로 표시
@@ -555,6 +586,7 @@
 **의존성**: FE-05, FE-08, BE-11, BE-14
 
 **완료 조건**:
+
 - [x] `TodoListPage.tsx`가 `TodoFilterPanel`과 `TodoList`를 조합
 - [x] `TodoFilterPanel.tsx`: 카테고리 드롭다운, 완료 여부(전체/미완료/완료), 종료예정일 범위 입력
 - [x] 필터 변경 시 TanStack Query 자동 재요청, `todoKeys.list(filters)` 쿼리 키 사용
@@ -573,6 +605,7 @@
 **의존성**: FE-09, BE-11, BE-12
 
 **완료 조건**:
+
 - [x] `TodoForm.tsx`: 제목(필수, 1~200자), 설명(선택), 종료예정일(선택), 카테고리(필수)
 - [x] 제목 비어있거나 200자 초과 시 클라이언트 검증 에러 표시 (BR-T-01)
 - [x] 카테고리 드롭다운이 `useCategories` 훅 데이터 기반 렌더링
@@ -593,6 +626,7 @@
 **의존성**: FE-09, BE-13
 
 **완료 조건**:
+
 - [x] `TodoCard.tsx` 체크박스 클릭 시 현재 상태에 따라 complete/reopen API 호출
 - [x] 완료 상태 카드에 취소선·색상 변경 등 시각적 구분 스타일 적용
 - [x] API 성공 후 `todoKeys.list()` 무효화로 자동 갱신
@@ -610,14 +644,15 @@
 **의존성**: FE-09, BE-12
 
 **완료 조건**:
-- [ ] `TodoCard.tsx`에 삭제 버튼 존재
-- [ ] 삭제 버튼 클릭 시 `Modal` 확인 다이얼로그 표시 ("정말 삭제하시겠습니까?")
-- [ ] 확인 후 `useTodoMutations.ts`의 `deleteTodo` 뮤테이션이 DELETE API 호출
-- [ ] 성공 후 `todoKeys.list()` 무효화로 즉시 목록에서 제거
-- [ ] 호출 중 확인 버튼 로딩 상태·비활성화
-- [ ] 삭제 후 할일 0건이면 빈 상태 UI 표시
-- [ ] 에러 시 Modal 내 에러 메시지 표시
-- [ ] 취소 버튼 클릭 시 API 미호출, Modal 닫힘
+
+- [x] `TodoCard.tsx`에 삭제 버튼 존재
+- [x] 삭제 버튼 클릭 시 `Modal` 확인 다이얼로그 표시 ("정말 삭제하시겠습니까?")
+- [x] 확인 후 `useTodoMutations.ts`의 `deleteTodo` 뮤테이션이 DELETE API 호출
+- [x] 성공 후 `todoKeys.list()` 무효화로 즉시 목록에서 제거
+- [x] 호출 중 확인 버튼 로딩 상태·비활성화
+- [x] 삭제 후 할일 0건이면 빈 상태 UI 표시
+- [x] 에러 시 Modal 내 에러 메시지 표시
+- [x] 취소 버튼 클릭 시 API 미호출, Modal 닫힘
 
 ---
 
@@ -647,7 +682,7 @@ BE-01
                       └── BE-11 ─┬── BE-12
                                   ├── BE-13
                                   └── BE-14
-                                  
+
 BE-05 ~ BE-14 ────────────── BE-15
 
 [프론트엔드]
@@ -663,14 +698,14 @@ FE-01
 ### 5.2 도메인 간 의존성
 
 | 프론트엔드 태스크 | 의존하는 백엔드 태스크 | 의존하는 DB 태스크 |
-|------------------|----------------------|-------------------|
-| FE-06 | BE-05, BE-06 | DB-08 |
-| FE-07 | BE-07, BE-08 | DB-08 |
-| FE-08 | BE-09, BE-10 | DB-08 |
-| FE-09 | BE-11, BE-14 | DB-08 |
-| FE-10 | BE-11, BE-12 | DB-08 |
-| FE-11 | BE-13 | DB-08 |
-| FE-12 | BE-12 | DB-08 |
+| ----------------- | ---------------------- | ------------------ |
+| FE-06             | BE-05, BE-06           | DB-08              |
+| FE-07             | BE-07, BE-08           | DB-08              |
+| FE-08             | BE-09, BE-10           | DB-08              |
+| FE-09             | BE-11, BE-14           | DB-08              |
+| FE-10             | BE-11, BE-12           | DB-08              |
+| FE-11             | BE-13                  | DB-08              |
+| FE-12             | BE-12                  | DB-08              |
 
 ### 5.3 권장 실행 단계 (병렬 그룹)
 

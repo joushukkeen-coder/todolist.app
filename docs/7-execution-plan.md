@@ -1,7 +1,8 @@
 # TodoListApp 실행 계획서
 
-> 버전: 2.0.0
+> 버전: 2.3.0
 > 작성일: 2026-05-13
+> 최종 수정: 2026-05-14
 > 참조: PRD v1.0.2, docs/4-project-principles.md, docs/6-erd.md, database/schema.sql
 
 ---
@@ -11,6 +12,9 @@
 | 버전  | 날짜       | 작성자      | 변경 내용                                             |
 | ----- | ---------- | ----------- | ----------------------------------------------------- |
 | 2.0.0 | 2026-05-13 | joushukkeen | DB·백엔드·프론트엔드 3개 도메인 병렬 분석 기반 재작성 |
+| 2.1.0 | 2026-05-14 | joushukkeen | 구현 반영: `server/` → `backend/` 경로 갱신, 구조화 로깅(`utils/logger.js`)·Swagger UI(`/api-docs`) 도입, `PATCH /users/me/password` 라우트 누락 수정, FE-09~FE-12 완료 체크 |
+| 2.2.0 | 2026-05-14 | joushukkeen | `client/` → `frontend/` 디렉토리 명 변경, FE 태스크 본문의 경로 표기 갱신 |
+| 2.3.0 | 2026-05-14 | joushukkeen | `frontend/` 디렉토리 삭제(재구축 예정), FE-01~FE-12 완료 조건 체크박스 전체 초기화 |
 
 ---
 
@@ -52,13 +56,13 @@
 
 ### DB-02: .env DB 연결 정보 설정
 
-**설명**: `server/.env.development`에 PostgreSQL 접속 환경 변수를 정의하고 `.env.example`에 키 목록을 기재한다.
+**설명**: `backend/.env.development`에 PostgreSQL 접속 환경 변수를 정의하고 `.env.example`에 키 목록을 기재한다.
 **의존성**: DB-01
 
 **완료 조건**:
 
-- [x] `server/.env.development`에 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` 키 모두 존재
-- [x] `server/.env.example`에 동일 키가 플레이스홀더로 기재됨
+- [x] `backend/.env.development`에 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` 키 모두 존재
+- [x] `backend/.env.example`에 동일 키가 플레이스홀더로 기재됨
 - [x] `.gitignore`에 `.env.development`, `.env.production` 등록되어 `git status`에서 추적 제외
 - [x] `DB_PORT` 기본값 `5432` 설정
 - [x] `DB_NAME` 값이 DB-01의 `todolistapp_dev`와 일치
@@ -140,12 +144,12 @@
 
 ### DB-08: pg Pool 연결 구현 검증
 
-**설명**: `server/src/db/pool.js`에 pg.Pool 단일 인스턴스를 구현하고 애플리케이션 시작 시 DB 연결 성공을 검증한다.
+**설명**: `backend/src/db/pool.js`에 pg.Pool 단일 인스턴스를 구현하고 애플리케이션 시작 시 DB 연결 성공을 검증한다.
 **의존성**: DB-02, DB-03
 
 **완료 조건**:
 
-- [x] `server/src/db/pool.js`에 `pg.Pool` 인스턴스가 생성되고 단일 인스턴스로 export
+- [x] `backend/src/db/pool.js`에 `pg.Pool` 인스턴스가 생성되고 단일 인스턴스로 export
 - [x] `max`, `idleTimeoutMillis`, `connectionTimeoutMillis` 옵션 명시
 - [x] 연결 정보는 `config/env.js`를 통해 주입되며 하드코딩 없음
 - [x] `pool.query('SELECT 1')` 핑 쿼리로 DB 연결 성공 확인
@@ -158,16 +162,16 @@
 
 ### BE-01: 프로젝트 초기화
 
-**설명**: `server/` 디렉토리에 Node.js + Express 프로젝트를 생성하고 디렉토리 구조·환경 변수 체계를 확립한다.
+**설명**: `backend/` 디렉토리에 Node.js + Express 프로젝트를 생성하고 디렉토리 구조·환경 변수 체계를 확립한다.
 **의존성**: 없음
 
 **완료 조건**:
 
-- [x] `server/package.json` 생성, 모듈 시스템 결정 명시
+- [x] `backend/package.json` 생성, 모듈 시스템 결정 명시
 - [x] 의존성 설치: `express`, `pg`, `bcrypt`, `jsonwebtoken`, `dotenv`, `cors`, `morgan`
 - [x] 개발 의존성 설치: `jest`, `supertest`, `nodemon`
-- [x] `server/src/` 하위에 `config/`, `db/`, `routes/`, `controllers/`, `services/`, `repositories/`, `middlewares/`, `utils/` 디렉토리 생성
-- [x] `server/tests/unit/services/`, `server/tests/integration/api/` 생성
+- [x] `backend/src/` 하위에 `config/`, `db/`, `routes/`, `controllers/`, `services/`, `repositories/`, `middlewares/`, `utils/` 디렉토리 생성
+- [x] `backend/tests/unit/services/`, `backend/tests/integration/api/` 생성
 - [x] `.env.example`에 `NODE_ENV`, `PORT`, DB 키, `JWT_SECRET`, `JWT_EXPIRES_IN` 모두 기재
 - [x] `.env.development`에 실제 개발 값 설정 (`.gitignore` 등록 확인)
 - [x] `config/env.js`가 필수 환경 변수 누락 시 `process.exit(1)` 실행
@@ -184,7 +188,7 @@
 
 **완료 조건**:
 
-- [x] `server/src/db/pool.js`에 `pg.Pool` 인스턴스 생성 및 export
+- [x] `backend/src/db/pool.js`에 `pg.Pool` 인스턴스 생성 및 export
 - [x] 풀 설정값(`max`, `idleTimeoutMillis`, `connectionTimeoutMillis`) 명시
 - [x] DB 연결 정보를 `config/env.js`에서 가져옴 (하드코딩 금지)
 - [x] 서버 시작 시 `pool.query('SELECT 1')` 핑 쿼리로 연결 확인 및 실패 시 에러 로그
@@ -427,7 +431,7 @@
 - [x] 단위 테스트 파일: 각 Service에 대응 (Repository는 `jest.mock()`으로 대체)
 - [x] Service 단위 테스트 커버: 이메일 중복, 소유권 검증, 기본 카테고리 변경 불가, 완료 상태 중복 변경 방지, 기간 필터 NULL 제외
 - [x] `jest --coverage` 결과: 전체 80% 이상, Service 계층 90% 이상 (PRD §4.2)
-- [x] Insomnia 또는 Postman 컬렉션 파일이 `server/` 하위에 존재
+- [x] Insomnia 또는 Postman 컬렉션 파일이 `backend/` 하위에 존재
 
 ---
 
@@ -435,12 +439,12 @@
 
 ### FE-01: 프로젝트 초기화 및 디렉토리 구조 구성
 
-**설명**: Vite + React 19 + TypeScript 기반으로 `client/` 디렉토리를 생성하고 프로젝트 원칙에 따른 폴더 구조·개발 환경 설정을 완료한다.
+**설명**: Vite + React 19 + TypeScript 기반으로 `frontend/` 디렉토리를 생성하고 프로젝트 원칙에 따른 폴더 구조·개발 환경 설정을 완료한다.
 **의존성**: 없음
 
 **완료 조건**:
 
-- [x] `client/src/` 하위에 `pages/`, `components/common/`, `components/todo/`, `components/category/`, `components/layout/`, `hooks/`, `services/`, `store/`, `query-keys/`, `types/`, `utils/`, `router/` 모두 생성
+- [x] `frontend/src/` 하위에 `pages/`, `components/common/`, `components/todo/`, `components/category/`, `components/layout/`, `hooks/`, `services/`, `store/`, `query-keys/`, `types/`, `utils/`, `router/` 모두 생성
 - [x] `vite.config.ts`에 경로 별칭(`@/` → `src/`) 설정
 - [x] `tsconfig.json`에 `strict`, `noImplicitAny`, `strictNullChecks`, `noUncheckedIndexedAccess` 활성화
 - [x] ESLint + Prettier + `eslint-config-prettier` 설치 및 `.eslintrc` 작성
@@ -535,7 +539,7 @@
 - [x] 회원가입 성공 시 로그인 페이지 이동 또는 자동 로그인 처리
 - [x] API 호출 중 Spinner 표시 (로딩 상태)
 - [x] 401·409 등 API 에러 시 `ErrorMessage`로 표시 (에러 상태)
-- [x] PC·모바일 양쪽에서 폼 정상 표시
+- [ ] PC·모바일 양쪽에서 폼 정상 표시
 
 ---
 
@@ -555,7 +559,7 @@
 - [x] 탈퇴 성공 시 `authStore.clearAuth()` 후 `/login` 이동
 - [x] 로딩·에러 상태 처리
 - [x] TanStack Query 훅이 `hooks/` 계층에 캡슐화되어 페이지에서 axios 직접 호출 없음
-- [x] PC·모바일 양쪽에서 레이아웃 정상
+- [ ] PC·모바일 양쪽에서 레이아웃 정상
 
 ---
 
@@ -566,17 +570,17 @@
 
 **완료 조건**:
 
-- [x] `CategoryPage.tsx`: 기본 카테고리(개인/업무/쇼핑)와 사용자 정의 카테고리 구분 표시
-- [x] 기본 카테고리는 수정·삭제 버튼 비활성화 또는 숨김 (BR-C-01)
-- [x] `CategoryForm.tsx`: 이름·색상 코드 입력, `Modal`로 표시
-- [x] 생성 버튼: 빈 폼 Modal 열림
-- [x] 수정 버튼: 기존 데이터 채워진 폼 Modal 열림
-- [x] 삭제 버튼: 확인 Modal 표시 후 삭제 API 호출
-- [x] `useCategories.ts`가 `useQuery`로 목록 조회
-- [x] `useCategoryMutations.ts`가 `useMutation`으로 생성·수정·삭제, 성공 시 `categoryKeys` 무효화
-- [x] `CategoryBadge.tsx`가 이름·색상 시각화
-- [x] 로딩·에러·빈 상태 각각 처리
-- [x] PC·모바일 양쪽에서 정상 표시
+- [ ] `CategoryPage.tsx`: 기본 카테고리(개인/업무/쇼핑)와 사용자 정의 카테고리 구분 표시
+- [ ] 기본 카테고리는 수정·삭제 버튼 비활성화 또는 숨김 (BR-C-01)
+- [ ] `CategoryForm.tsx`: 이름·색상 코드 입력, `Modal`로 표시
+- [ ] 생성 버튼: 빈 폼 Modal 열림
+- [ ] 수정 버튼: 기존 데이터 채워진 폼 Modal 열림
+- [ ] 삭제 버튼: 확인 Modal 표시 후 삭제 API 호출
+- [ ] `useCategories.ts`가 `useQuery`로 목록 조회
+- [ ] `useCategoryMutations.ts`가 `useMutation`으로 생성·수정·삭제, 성공 시 `categoryKeys` 무효화
+- [ ] `CategoryBadge.tsx`가 이름·색상 시각화
+- [ ] 로딩·에러·빈 상태 각각 처리
+- [ ] PC·모바일 양쪽에서 정상 표시
 
 ---
 
@@ -587,15 +591,15 @@
 
 **완료 조건**:
 
-- [x] `TodoListPage.tsx`가 `TodoFilterPanel`과 `TodoList`를 조합
-- [x] `TodoFilterPanel.tsx`: 카테고리 드롭다운, 완료 여부(전체/미완료/완료), 종료예정일 범위 입력
-- [x] 필터 변경 시 TanStack Query 자동 재요청, `todoKeys.list(filters)` 쿼리 키 사용
-- [x] 기간 필터는 종료예정일 기준 동작, NULL 할일은 결과 제외 (BR-F-02)
-- [x] `TodoCard.tsx`: 제목·카테고리 배지·종료예정일·완료 체크박스 표시
-- [x] 생성일시 역순 정렬 (BR-F-03)
-- [x] 로딩(Spinner)·에러(ErrorMessage)·빈 상태(안내 문구) 각각 처리
-- [x] `useTodos.ts` 훅이 필터 파라미터 관리
-- [x] PC에서 필터 패널 사이드/상단, 모바일에서 접힘/펼침 표시
+- [ ] `TodoListPage.tsx`가 `TodoFilterPanel`과 `TodoList`를 조합
+- [ ] `TodoFilterPanel.tsx`: 카테고리 드롭다운, 완료 여부(전체/미완료/완료), 종료예정일 범위 입력
+- [ ] 필터 변경 시 TanStack Query 자동 재요청, `todoKeys.list(filters)` 쿼리 키 사용
+- [ ] 기간 필터는 종료예정일 기준 동작, NULL 할일은 결과 제외 (BR-F-02)
+- [ ] `TodoCard.tsx`: 제목·카테고리 배지·종료예정일·완료 체크박스 표시
+- [ ] 생성일시 역순 정렬 (BR-F-03)
+- [ ] 로딩(Spinner)·에러(ErrorMessage)·빈 상태(안내 문구) 각각 처리
+- [ ] `useTodos.ts` 훅이 필터 파라미터 관리
+- [ ] PC에서 필터 패널 사이드/상단, 모바일에서 접힘/펼침 표시
 
 ---
 
@@ -606,17 +610,17 @@
 
 **완료 조건**:
 
-- [x] `TodoForm.tsx`: 제목(필수, 1~200자), 설명(선택), 종료예정일(선택), 카테고리(필수)
-- [x] 제목 비어있거나 200자 초과 시 클라이언트 검증 에러 표시 (BR-T-01)
-- [x] 카테고리 드롭다운이 `useCategories` 훅 데이터 기반 렌더링
-- [x] 등록 모드·수정 모드를 동일 컴포넌트에서 처리 (수정 모드는 기존 값 초기값 주입)
-- [x] `TodoListPage`의 "새 할일 추가" 버튼 클릭 시 빈 폼 Modal
-- [x] `TodoCard` 수정 버튼 클릭 시 데이터 채워진 폼 Modal
-- [x] `useTodoMutations.ts`의 `createTodo`, `updateTodo` 뮤테이션이 API 호출
-- [x] 성공 시 `todoKeys.list()` 무효화로 자동 갱신
-- [x] 호출 중 제출 버튼 로딩 상태·비활성화
-- [x] 에러 시 폼 내 ErrorMessage 표시
-- [x] PC·모바일 양쪽에서 Modal 정상 표시
+- [ ] `TodoForm.tsx`: 제목(필수, 1~200자), 설명(선택), 종료예정일(선택), 카테고리(필수)
+- [ ] 제목 비어있거나 200자 초과 시 클라이언트 검증 에러 표시 (BR-T-01)
+- [ ] 카테고리 드롭다운이 `useCategories` 훅 데이터 기반 렌더링
+- [ ] 등록 모드·수정 모드를 동일 컴포넌트에서 처리 (수정 모드는 기존 값 초기값 주입)
+- [ ] `TodoListPage`의 "새 할일 추가" 버튼 클릭 시 빈 폼 Modal
+- [ ] `TodoCard` 수정 버튼 클릭 시 데이터 채워진 폼 Modal
+- [ ] `useTodoMutations.ts`의 `createTodo`, `updateTodo` 뮤테이션이 API 호출
+- [ ] 성공 시 `todoKeys.list()` 무효화로 자동 갱신
+- [ ] 호출 중 제출 버튼 로딩 상태·비활성화
+- [ ] 에러 시 폼 내 ErrorMessage 표시
+- [ ] PC·모바일 양쪽에서 Modal 정상 표시
 
 ---
 
@@ -627,14 +631,14 @@
 
 **완료 조건**:
 
-- [x] `TodoCard.tsx` 체크박스 클릭 시 현재 상태에 따라 complete/reopen API 호출
-- [x] 완료 상태 카드에 취소선·색상 변경 등 시각적 구분 스타일 적용
-- [x] API 성공 후 `todoKeys.list()` 무효화로 자동 갱신
-- [x] 낙관적 업데이트(`onMutate`)로 즉각 피드백, 오류 시 `onError`에서 롤백
-- [x] `useTodoMutations.ts`에 `completeTodo`, `reopenTodo` 뮤테이션 구현
-- [x] 완료 필터 적용 상태에서 토글 후 목록 올바르게 갱신
-- [x] API 에러 시 ErrorMessage 표시
-- [x] 체크박스 영역이 모바일 터치 기준 최소 44×44px
+- [ ] `TodoCard.tsx` 체크박스 클릭 시 현재 상태에 따라 complete/reopen API 호출
+- [ ] 완료 상태 카드에 취소선·색상 변경 등 시각적 구분 스타일 적용
+- [ ] API 성공 후 `todoKeys.list()` 무효화로 자동 갱신
+- [ ] 낙관적 업데이트(`onMutate`)로 즉각 피드백, 오류 시 `onError`에서 롤백
+- [ ] `useTodoMutations.ts`에 `completeTodo`, `reopenTodo` 뮤테이션 구현
+- [ ] 완료 필터 적용 상태에서 토글 후 목록 올바르게 갱신
+- [ ] API 에러 시 ErrorMessage 표시
+- [ ] 체크박스 영역이 모바일 터치 기준 최소 44×44px
 
 ---
 
@@ -645,14 +649,14 @@
 
 **완료 조건**:
 
-- [x] `TodoCard.tsx`에 삭제 버튼 존재
-- [x] 삭제 버튼 클릭 시 `Modal` 확인 다이얼로그 표시 ("정말 삭제하시겠습니까?")
-- [x] 확인 후 `useTodoMutations.ts`의 `deleteTodo` 뮤테이션이 DELETE API 호출
-- [x] 성공 후 `todoKeys.list()` 무효화로 즉시 목록에서 제거
-- [x] 호출 중 확인 버튼 로딩 상태·비활성화
-- [x] 삭제 후 할일 0건이면 빈 상태 UI 표시
-- [x] 에러 시 Modal 내 에러 메시지 표시
-- [x] 취소 버튼 클릭 시 API 미호출, Modal 닫힘
+- [ ] `TodoCard.tsx`에 삭제 버튼 존재
+- [ ] 삭제 버튼 클릭 시 `Modal` 확인 다이얼로그 표시 ("정말 삭제하시겠습니까?")
+- [ ] 확인 후 `useTodoMutations.ts`의 `deleteTodo` 뮤테이션이 DELETE API 호출
+- [ ] 성공 후 `todoKeys.list()` 무효화로 즉시 목록에서 제거
+- [ ] 호출 중 확인 버튼 로딩 상태·비활성화
+- [ ] 삭제 후 할일 0건이면 빈 상태 UI 표시
+- [ ] 에러 시 Modal 내 에러 메시지 표시
+- [ ] 취소 버튼 클릭 시 API 미호출, Modal 닫힘
 
 ---
 

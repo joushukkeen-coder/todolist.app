@@ -1,11 +1,24 @@
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 
+const ROOT = path.resolve(__dirname, '..', '..');
+
+// 1) 공통 .env (모든 환경의 기본값) - 존재 시 먼저 로드
+const baseEnv = path.join(ROOT, '.env');
+if (fs.existsSync(baseEnv)) {
+  dotenv.config({ path: baseEnv });
+}
+
+// 2) NODE_ENV별 .env.{env} 파일로 덮어쓰기
 const envFile =
   process.env.NODE_ENV === 'production' ? '.env.production'
   : process.env.NODE_ENV === 'test' ? '.env.test'
   : '.env.development';
-dotenv.config({ path: path.resolve(__dirname, '..', '..', envFile) });
+const envFilePath = path.join(ROOT, envFile);
+if (fs.existsSync(envFilePath)) {
+  dotenv.config({ path: envFilePath, override: true });
+}
 
 const REQUIRED = [
   'NODE_ENV',
@@ -25,6 +38,14 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
+function parseCorsOrigin(raw) {
+  if (!raw || raw.trim() === '*') return '*';
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 module.exports = {
   nodeEnv: process.env.NODE_ENV,
   port: Number(process.env.PORT),
@@ -38,5 +59,8 @@ module.exports = {
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN,
+  },
+  cors: {
+    origin: parseCorsOrigin(process.env.CORS_ORIGIN),
   },
 };

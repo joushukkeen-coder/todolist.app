@@ -1,9 +1,16 @@
 const AppError = require('../utils/AppError');
 const { hashPassword, comparePassword } = require('../utils/hash');
 const userRepository = require('../repositories/user.repository');
+const logger = require('../utils/logger');
 
 async function updateProfile(userId, { email, name, currentPassword, newPassword }) {
+  logger.info('user.service', 'updateProfile requested', {
+    userId,
+    nameChanged: name !== undefined,
+    passwordChange: newPassword !== undefined,
+  });
   if (email !== undefined) {
+    logger.warn('user.service', 'email change attempt blocked', { userId });
     throw new AppError('EMAIL_CHANGE_NOT_ALLOWED', 400, '이메일은 변경할 수 없습니다');
   }
 
@@ -16,12 +23,14 @@ async function updateProfile(userId, { email, name, currentPassword, newPassword
     }
     const user = await userRepository.findById(userId);
     if (!user) {
+      logger.warn('user.service', 'user not found', { userId });
       throw new AppError('USER_NOT_FOUND', 404, '사용자를 찾을 수 없습니다');
     }
     const ok = currentPassword
       ? await comparePassword(currentPassword, user.passwordHash)
       : false;
     if (!ok) {
+      logger.warn('user.service', 'current password mismatch', { userId });
       throw new AppError('INVALID_CURRENT_PASSWORD', 401, '현재 비밀번호가 올바르지 않습니다');
     }
     fields.passwordHash = await hashPassword(newPassword);
@@ -31,15 +40,19 @@ async function updateProfile(userId, { email, name, currentPassword, newPassword
   if (!updated) {
     throw new AppError('USER_NOT_FOUND', 404, '사용자를 찾을 수 없습니다');
   }
+  logger.info('user.service', 'updateProfile success', { userId });
   return updated;
 }
 
 async function deleteAccount(userId) {
+  logger.info('user.service', 'deleteAccount requested', { userId });
   const user = await userRepository.findById(userId);
   if (!user) {
+    logger.warn('user.service', 'deleteAccount user not found', { userId });
     throw new AppError('USER_NOT_FOUND', 404, '사용자를 찾을 수 없습니다');
   }
   await userRepository.deleteById(userId);
+  logger.info('user.service', 'deleteAccount success', { userId });
 }
 
 module.exports = { updateProfile, deleteAccount };

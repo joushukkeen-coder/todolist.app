@@ -1,0 +1,35 @@
+.auth-page {
+  max-width: 360px;
+  margin: 64px auto;
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+.auth-page h1 {
+  margin: 0 0 var(--space-5);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.auth-page__form {
+  display: flex;
+  flex-direction: column;
+}
+.auth-page__form > button {
+  margin-top: var(--space-2);
+}
+.auth-page__link {
+  margin-top: var(--space-4);
+  margin-bottom: 0;
+  font-size: 13px;
+  color: var(--color-text-sub);
+  text-align: center;
+}
+.auth-page__link a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.auth-page__link a:hover {
+  text-decoration: underline;
+}

@@ -1,7 +1,8 @@
 # TodoListApp 프로젝트 구조 설계 원칙
 
-> 버전: 1.0.0
+> 버전: 1.2.0
 > 작성일: 2026-05-13
+> 최종 수정: 2026-05-14
 > 참조: PRD v1.0.1
 
 ---
@@ -11,6 +12,8 @@
 | 버전 | 날짜 | 작성자 | 변경 내용 |
 |------|------|--------|-----------|
 | 1.0.0 | 2026-05-13 | joushukkeen | 최초 작성 |
+| 1.1.0 | 2026-05-14 | joushukkeen | 구현 반영: `server/` → `backend/` 디렉토리 명 변경, `routes/index.js`·`utils/logger.js` 추가, `app.js` Swagger UI(`/api-docs`) 마운트 명시, `user.routes`에 `PATCH /me/password` 라우트 표기 |
+| 1.2.0 | 2026-05-14 | joushukkeen | `client/` → `frontend/` 디렉토리 명 변경, 관련 트리·설명·husky 훅 경로 반영 |
 
 ---
 
@@ -20,14 +23,14 @@
 
 모노레포(monorepo) 방식을 채택한다.
 
-프론트엔드와 백엔드를 단일 Git 레포지토리 내 `client/`와 `server/` 디렉토리로 분리한다. 소규모 단일 서버 배포 프로젝트이므로 멀티레포의 독립 배포 이점이 불필요하며, 모노레포로 관리하면 타입 정의, API 계약 변경, 환경 설정을 단일 PR에서 추적할 수 있다.
+프론트엔드와 백엔드를 단일 Git 레포지토리 내 `frontend/`와 `backend/` 디렉토리로 분리한다. 소규모 단일 서버 배포 프로젝트이므로 멀티레포의 독립 배포 이점이 불필요하며, 모노레포로 관리하면 타입 정의, API 계약 변경, 환경 설정을 단일 PR에서 추적할 수 있다.
 
 **최상위 디렉토리 구성**
 
 ```
 todolist.app/
-├── client/          # React 19 프론트엔드
-├── server/          # Node.js + Express 백엔드
+├── frontend/        # React 19 프론트엔드
+├── backend/         # Node.js + Express 백엔드
 ├── docs/            # 설계 문서
 ├── .gitignore
 └── README.md
@@ -44,7 +47,7 @@ todolist.app/
 ### 1.3 코드 포맷터 및 린터 통일
 
 - ESLint와 Prettier를 필수 도구로 사용하며, 두 도구의 규칙이 충돌하지 않도록 `eslint-config-prettier`를 적용한다.
-- 포맷 규칙은 프로젝트 루트의 단일 설정 파일로 관리한다. `client/`와 `server/` 각각의 ESLint 설정은 루트 설정을 상속(extends)하여 도메인별 추가 규칙만 덮어쓴다.
+- 포맷 규칙은 프로젝트 루트의 단일 설정 파일로 관리한다. `frontend/`와 `backend/` 각각의 ESLint 설정은 루트 설정을 상속(extends)하여 도메인별 추가 규칙만 덮어쓴다.
 - 커밋 전 자동 포맷 적용을 위해 `lint-staged`와 `husky`를 설정한다.
 - TypeScript를 사용하는 클라이언트는 `tsc --noEmit` 타입 검사를 CI 파이프라인에 포함한다.
 
@@ -174,7 +177,7 @@ Pages → Components → Hooks → Services(API) → Store
 
 ### 4.3 API 테스트 방식
 
-- HTTP 클라이언트 도구(Insomnia, Postman)용 컬렉션 파일을 `server/` 하위에 유지한다.
+- HTTP 클라이언트 도구(Insomnia, Postman)용 컬렉션 파일을 `backend/` 하위에 유지한다.
 - 자동화 통합 테스트는 `supertest`를 사용하여 실제 Express 앱 인스턴스를 대상으로 실행한다.
 - 테스트 케이스는 정상 흐름(happy path)과 주요 오류 흐름(인증 실패, 소유권 위반, 유효성 오류)을 모두 포함한다.
 
@@ -230,7 +233,7 @@ Pages → Components → Hooks → Services(API) → Store
 ## 6. 백엔드 디렉토리 구조
 
 ```
-server/
+backend/
 ├── src/
 │   ├── app.js                  # Express 앱 인스턴스 생성, 미들웨어 및 라우터 등록
 │   ├── server.js               # HTTP 서버 시작 진입점, 환경 변수 검증
@@ -242,8 +245,9 @@ server/
 │   │   └── pool.js             # pg Pool 인스턴스 생성 및 export
 │   │
 │   ├── routes/
+│   │   ├── index.js            # 도메인 라우터 결합 (auth/users/categories/todos)
 │   │   ├── auth.routes.js      # /api/v1/auth 경로 정의, 미들웨어 체인
-│   │   ├── user.routes.js      # /api/v1/users 경로 정의
+│   │   ├── user.routes.js      # /api/v1/users 경로 정의 (PATCH /me/password 포함)
 │   │   ├── category.routes.js  # /api/v1/categories 경로 정의
 │   │   └── todo.routes.js      # /api/v1/todos 경로 정의
 │   │
@@ -272,7 +276,8 @@ server/
 │   └── utils/
 │       ├── AppError.js         # 커스텀 에러 클래스 (code, statusCode 포함)
 │       ├── jwt.js              # JWT 발급 및 검증 헬퍼
-│       └── hash.js             # bcrypt 해시 생성 및 비교 헬퍼
+│       ├── hash.js             # bcrypt 해시 생성 및 비교 헬퍼
+│       └── logger.js           # 구조화 콘솔 로거 (info/warn/error, 타임스탬프·태그·JSON data)
 │
 ├── tests/
 │   ├── unit/
@@ -304,7 +309,7 @@ server/
 ## 7. 프론트엔드 디렉토리 구조
 
 ```
-client/
+frontend/
 ├── src/
 │   ├── main.tsx                # Vite 진입점, ReactDOM.createRoot, QueryClientProvider, BrowserRouter
 │   ├── App.tsx                 # 라우트 설정, 전역 레이아웃, 인증 가드 구성
@@ -413,7 +418,7 @@ client/
 
 **`src/app.js`**
 
-Express 앱 인스턴스를 생성하고 내보내는 파일이다. `server.js`에서 포트 바인딩과 분리되어 통합 테스트 시 서버 시작 없이 앱 인스턴스를 임포트할 수 있어야 한다. JSON 파싱 미들웨어, CORS 설정, morgan 로거, 라우터 등록, 중앙 에러 핸들러를 이 파일에서 순서대로 등록한다.
+Express 앱 인스턴스를 생성하고 내보내는 파일이다. `server.js`에서 포트 바인딩과 분리되어 통합 테스트 시 서버 시작 없이 앱 인스턴스를 임포트할 수 있어야 한다. JSON 파싱 미들웨어, CORS 설정, morgan 로거, Swagger UI 마운트(`/api-docs`, `swagger/swagger.json` 로드), 라우터 등록, 중앙 에러 핸들러를 이 파일에서 순서대로 등록한다.
 
 **`src/server.js`**
 
@@ -425,7 +430,15 @@ HTTP 서버를 시작하는 진입점이다. 서버 시작 전 필수 환경 변
 
 **`src/middlewares/auth.js`**
 
-Authorization 헤더에서 Bearer 토큰을 추출하고 JWT를 검증하는 미들웨어다. 검증 성공 시 `req.user = { userId }` 형태로 사용자 정보를 주입하고 `next()`를 호출한다. 검증 실패 시 `next(new AppError('UNAUTHORIZED', 401))`를 호출하여 중앙 에러 핸들러로 전달한다. 이 미들웨어는 토큰 검증만 담당하며, 리소스 소유권 검증은 담당하지 않는다.
+Authorization 헤더에서 Bearer 토큰을 추출하고 JWT를 검증하는 미들웨어다. 검증 성공 시 `req.user = { userId }` 형태로 사용자 정보를 주입하고 `next()`를 호출한다. 검증 실패 시 `next(new AppError('UNAUTHORIZED', 401))`를 호출하여 중앙 에러 핸들러로 전달한다. 이 미들웨어는 토큰 검증만 담당하며, 리소스 소유권 검증은 담당하지 않는다. 검증 결과(성공·실패 사유·요청 경로)는 `utils/logger`로 INFO/WARN 레벨에 기록한다.
+
+**`src/routes/index.js`**
+
+도메인별 라우터(`auth.routes.js`, `user.routes.js`, `category.routes.js`, `todo.routes.js`)를 하나의 Express Router에 결합하여 `/api/v1` 하위로 마운트하는 진입점이다. `app.js`는 이 단일 라우터만 import하므로 신규 도메인 추가 시 변경 지점이 한 곳으로 한정된다.
+
+**`src/utils/logger.js`**
+
+`console.log/warn/error`를 일관된 포맷으로 감싸는 경량 구조화 로거다. 각 로그는 ISO 8601 타임스탬프, 레벨(`INFO`/`WARN`/`ERROR`), 태그(예: `auth.service`, `todo.service`, `errorHandler`), 메시지, 선택적 JSON 데이터로 구성된다. 비밀번호·비밀번호 해시·JWT 토큰·요청 본문 전체와 같은 민감 정보는 절대 기록하지 않으며, 식별자(`userId`, `email`, 리소스 id)와 작업 유형·결과만 남긴다. 별도 로깅 라이브러리에 대한 의존을 피하기 위해 외부 패키지 없이 구현한다.
 
 ### 8.2 프론트엔드
 

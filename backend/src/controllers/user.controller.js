@@ -45,4 +45,14 @@ async function deleteMe(req, res, next) {
   }
 }
 
-module.exports = { getMe, patchMe, deleteMe };
+async function changePassword(req, res, next) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await userService.updateProfile(req.user.userId, { currentPassword, newPassword });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMe, patchMe, deleteMe, changePassword };

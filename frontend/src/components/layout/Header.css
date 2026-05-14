@@ -1,0 +1,28 @@
+.app-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+.app-header__brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.app-header__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.app-header__name {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+@media (max-width: 1023.98px) {
+  .app-header {
+    height: 52px;
+  }
+}

@@ -7,6 +7,10 @@ const todoRoutes = require('./todo.routes');
 
 const router = express.Router();
 
+router.get('/', (req, res) => {
+  res.json({ name: 'TodoListApp API', version: 'v1', docs: '/api-docs' });
+});
+
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });

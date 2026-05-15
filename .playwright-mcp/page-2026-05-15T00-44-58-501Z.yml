@@ -1,0 +1,18 @@
+- generic [ref=e16]:
+  - heading "회원가입" [level=1] [ref=e17]
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]: 이메일
+      - textbox "이메일" [ref=e21]
+    - generic [ref=e22]:
+      - generic [ref=e23]: 비밀번호 (8자 이상)
+      - textbox "비밀번호 (8자 이상)" [ref=e24]
+    - generic [ref=e25]:
+      - generic [ref=e26]: 이름
+      - textbox "이름" [ref=e27]
+    - button "회원가입" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: 회원가입
+  - paragraph [ref=e30]:
+    - text: 이미 계정이 있으신가요?
+    - link "로그인" [ref=e31] [cursor=pointer]:
+      - /url: /login

@@ -13,6 +13,8 @@ async function getMe(req, res, next) {
       userId: user.userId,
       email: user.email,
       name: user.name,
+      darkMode: user.darkMode,
+      language: user.language,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -28,6 +30,8 @@ async function patchMe(req, res, next) {
       userId: updated.userId,
       email: updated.email,
       name: updated.name,
+      darkMode: updated.darkMode,
+      language: updated.language,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
     });

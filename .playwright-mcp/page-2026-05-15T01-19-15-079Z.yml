@@ -1,0 +1,16 @@
+- generic [ref=e19]:
+  - heading "로그인" [level=1] [ref=e20]
+  - generic [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]: 이메일
+      - textbox "이메일" [ref=e24]: e2e2_1778807914246@example.com
+    - generic [ref=e25]:
+      - generic [ref=e26]: 비밀번호
+      - textbox "비밀번호" [ref=e27]: WrongPw9999
+    - alert [ref=e32]: 이메일 또는 비밀번호가 올바르지 않습니다
+    - button "로그인" [ref=e28] [cursor=pointer]:
+      - generic [ref=e29]: 로그인
+  - paragraph [ref=e30]:
+    - text: 계정이 없으신가요?
+    - link "회원가입" [ref=e31] [cursor=pointer]:
+      - /url: /register

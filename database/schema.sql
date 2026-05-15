@@ -37,12 +37,25 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     name          VARCHAR(100) NOT NULL,
     auth_provider VARCHAR(20)  NOT NULL DEFAULT 'local',  -- OAuth v2 확장 대비 예약 컬럼
+    dark_mode     BOOLEAN     NOT NULL DEFAULT FALSE,    -- 사용자별 다크 모드 설정
+    language      VARCHAR(2)  NOT NULL DEFAULT 'ko',     -- 사용자별 UI 언어 (ko/en/ja)
     created_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT pk_users         PRIMARY KEY (user_id),
-    CONSTRAINT uq_users_email   UNIQUE (email)
+    CONSTRAINT pk_users           PRIMARY KEY (user_id),
+    CONSTRAINT uq_users_email     UNIQUE (email),
+    CONSTRAINT chk_users_language CHECK (language IN ('ko', 'en', 'ja'))
 );
+
+-- 기존 스키마 호환을 위한 멱등 컬럼 추가
+ALTER TABLE users ADD COLUMN IF NOT EXISTS dark_mode BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS language  VARCHAR(2) NOT NULL DEFAULT 'ko';
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_users_language') THEN
+        ALTER TABLE users ADD CONSTRAINT chk_users_language CHECK (language IN ('ko', 'en', 'ja'));
+    END IF;
+END $$;
 
 CREATE OR REPLACE TRIGGER trg_users_updated_at
     BEFORE UPDATE ON users
@@ -54,6 +67,8 @@ COMMENT ON COLUMN users.email           IS '로그인용 이메일 주소 (시�
 COMMENT ON COLUMN users.password_hash   IS 'bcrypt 해시 처리된 비밀번호 (salt rounds >= 10)';
 COMMENT ON COLUMN users.name            IS '사용자 표시 이름';
 COMMENT ON COLUMN users.auth_provider   IS '인증 제공자 식별자. 이메일/비밀번호 인증: local, 소셜 로그인: google/facebook 등';
+COMMENT ON COLUMN users.dark_mode       IS '다크 모드 사용 여부 (사용자별 UI 테마 설정)';
+COMMENT ON COLUMN users.language        IS '사용자별 UI 언어 (ISO 639-1: ko/en/ja). 기본값 ko';
 COMMENT ON COLUMN users.created_at      IS '계정 생성 일시';
 COMMENT ON COLUMN users.updated_at      IS '계정 마지막 수정 일시 (트리거 자동 갱신)';
 

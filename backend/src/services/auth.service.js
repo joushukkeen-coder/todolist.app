@@ -39,6 +39,8 @@ async function login({ email, password }) {
       userId: user.userId,
       email: user.email,
       name: user.name,
+      darkMode: user.darkMode,
+      language: user.language,
       createdAt: user.createdAt,
     },
   };

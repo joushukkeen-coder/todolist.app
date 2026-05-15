@@ -1210,6 +1210,19 @@
             "maxLength": 100,
             "example": "홍길동"
           },
+          "darkMode": {
+            "type": "boolean",
+            "description": "다크 모드 사용 여부 (사용자별 UI 테마). 기본값 false. PATCH /users/me로 토글.",
+            "default": false,
+            "example": false
+          },
+          "language": {
+            "type": "string",
+            "enum": ["ko", "en", "ja"],
+            "description": "사용자별 UI 언어 (ISO 639-1). 기본값 ko. PATCH /users/me로 변경.",
+            "default": "ko",
+            "example": "ko"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -1408,8 +1421,8 @@
       },
       "UserUpdateRequest": {
         "type": "object",
-        "description": "사용자 이름 변경 요청 본문. 이메일은 변경할 수 없습니다.",
-        "required": ["name"],
+        "description": "사용자 프로필 변경 요청 본문. `name`/`darkMode`/`language` 중 하나 이상 포함해야 합니다. 이메일은 변경할 수 없습니다.",
+        "minProperties": 1,
         "properties": {
           "name": {
             "type": "string",
@@ -1417,6 +1430,17 @@
             "minLength": 1,
             "maxLength": 100,
             "example": "김철수"
+          },
+          "darkMode": {
+            "type": "boolean",
+            "description": "다크 모드 사용 여부 토글. true → 다크, false → 라이트.",
+            "example": true
+          },
+          "language": {
+            "type": "string",
+            "enum": ["ko", "en", "ja"],
+            "description": "UI 언어 (ISO 639-1). 지원: ko/en/ja. 그 외 값은 400 VALIDATION_ERROR.",
+            "example": "en"
           }
         }
       },

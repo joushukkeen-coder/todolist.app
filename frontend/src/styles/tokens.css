@@ -40,3 +40,25 @@
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
     'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
+
+[data-theme='dark'] {
+  --color-primary: #9a7eff;
+  --color-primary-hover: #b099ff;
+  --color-primary-pressed: #7d61e0;
+  --color-primary-surface: #2a224f;
+
+  --color-danger: #ff6b6b;
+  --color-danger-surface: #3a1e1e;
+  --color-success: #2ecc71;
+  --color-warning: #ffb454;
+  --color-info: #4a90d9;
+
+  --color-bg: #1a1b1e;
+  --color-bg-subtle: #25262b;
+  --color-bg-muted: #2c2e33;
+  --color-border: #373a40;
+  --color-border-strong: #4a4d52;
+  --color-text: #e9ecef;
+  --color-text-sub: #adb5bd;
+  --color-text-muted: #6b7280;
+}

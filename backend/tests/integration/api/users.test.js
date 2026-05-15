@@ -49,6 +49,56 @@ describe('PATCH /api/v1/users/me', () => {
     r = await request(app).post('/api/v1/auth/login').send({ email: 'user@example.com', password: 'newpassword1' });
     expect(r.status).toBe(200);
   });
+
+  test('darkMode 기본값 false, PATCH로 true 설정 + 재로그인 시 유지', async () => {
+    const { bearer } = await registerAndLogin();
+    const me1 = await request(app).get('/api/v1/users/me').set('Authorization', bearer);
+    expect(me1.body.darkMode).toBe(false);
+
+    const upd = await request(app).patch('/api/v1/users/me').set('Authorization', bearer)
+      .send({ darkMode: true });
+    expect(upd.status).toBe(200);
+    expect(upd.body.darkMode).toBe(true);
+
+    const login = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'user@example.com', password: 'password1' });
+    expect(login.body.user.darkMode).toBe(true);
+  });
+
+  test('darkMode가 boolean이 아니면 400 VALIDATION_ERROR', async () => {
+    const { bearer } = await registerAndLogin();
+    const r = await request(app).patch('/api/v1/users/me').set('Authorization', bearer)
+      .send({ darkMode: 'yes' });
+    expect(r.status).toBe(400);
+    expect(r.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  test('language 기본값 ko, PATCH로 en/ja 설정 + 재로그인 시 유지', async () => {
+    const { bearer } = await registerAndLogin();
+    const me = await request(app).get('/api/v1/users/me').set('Authorization', bearer);
+    expect(me.body.language).toBe('ko');
+
+    const upd = await request(app).patch('/api/v1/users/me').set('Authorization', bearer)
+      .send({ language: 'en' });
+    expect(upd.status).toBe(200);
+    expect(upd.body.language).toBe('en');
+
+    const login = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'user@example.com', password: 'password1' });
+    expect(login.body.user.language).toBe('en');
+
+    const upd2 = await request(app).patch('/api/v1/users/me').set('Authorization', bearer)
+      .send({ language: 'ja' });
+    expect(upd2.body.language).toBe('ja');
+  });
+
+  test('language가 지원하지 않는 값이면 400 VALIDATION_ERROR', async () => {
+    const { bearer } = await registerAndLogin();
+    const r = await request(app).patch('/api/v1/users/me').set('Authorization', bearer)
+      .send({ language: 'zh' });
+    expect(r.status).toBe(400);
+    expect(r.body.error.code).toBe('VALIDATION_ERROR');
+  });
 });
 
 describe('DELETE /api/v1/users/me', () => {

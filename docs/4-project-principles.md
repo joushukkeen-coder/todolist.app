@@ -1,6 +1,6 @@
 # TodoListApp 프로젝트 구조 설계 원칙
 
-> 버전: 1.2.0
+> 버전: 1.5.0
 > 작성일: 2026-05-13
 > 최종 수정: 2026-05-14
 > 참조: PRD v1.0.1
@@ -14,6 +14,9 @@
 | 1.0.0 | 2026-05-13 | joushukkeen | 최초 작성 |
 | 1.1.0 | 2026-05-14 | joushukkeen | 구현 반영: `server/` → `backend/` 디렉토리 명 변경, `routes/index.js`·`utils/logger.js` 추가, `app.js` Swagger UI(`/api-docs`) 마운트 명시, `user.routes`에 `PATCH /me/password` 라우트 표기 |
 | 1.2.0 | 2026-05-14 | joushukkeen | `client/` → `frontend/` 디렉토리 명 변경, 관련 트리·설명·husky 훅 경로 반영 |
+| 1.3.0 | 2026-05-15 | joushukkeen | 다크 모드 도입: `hooks/useDarkMode.ts`(`useApplyDarkMode`·`useToggleDarkMode`), `tokens.css` `[data-theme='dark']` 변종, `users.dark_mode` 영속화 |
+| 1.4.0 | 2026-05-15 | joushukkeen | 다국어 도입: `i18n/messages.ts`(ko/en/ja 사전), `hooks/useLanguage.ts`(`useApplyLanguage`·`useTranslation`·`useChangeLanguage`), `users.language` 영속화 |
+| 1.5.0 | 2026-05-15 | joushukkeen | 메인 캘린더 뷰: `components/calendar/TodoCalendar.tsx` + `utils/calendar.ts` 추가, `HomePage`가 월간 그리드로 전환 |
 
 ---
 
@@ -340,6 +343,8 @@ frontend/
 │   │   │   ├── CategoryBadge.tsx
 │   │   │   ├── CategoryList.tsx
 │   │   │   └── CategoryForm.tsx
+│   │   ├── calendar/           # 메인 캘린더 뷰
+│   │   │   └── TodoCalendar.tsx  # 월간 그리드, dueDate 매칭 할일 표시, 다국어 요일 헤더
 │   │   └── layout/             # 페이지 레이아웃 컴포넌트
 │   │       ├── Header.tsx
 │   │       ├── Sidebar.tsx
@@ -350,7 +355,12 @@ frontend/
 │   │   ├── useTodos.ts         # 할일 목록 조회, 필터 파라미터 관리 (TanStack Query)
 │   │   ├── useTodoMutations.ts # 할일 생성/수정/삭제/완료 (TanStack Query useMutation)
 │   │   ├── useCategories.ts    # 카테고리 목록 조회
-│   │   └── useCategoryMutations.ts
+│   │   ├── useCategoryMutations.ts
+│   │   ├── useDarkMode.ts      # 다크 모드 적용(useApplyDarkMode) + 토글 mutation(useToggleDarkMode)
+│   │   └── useLanguage.ts      # 언어 적용(useApplyLanguage) + 번역(useTranslation) + 변경(useChangeLanguage)
+│   │
+│   ├── i18n/
+│   │   └── messages.ts         # ko/en/ja 번역 사전 + translate(language, key) 헬퍼
 │   │
 │   ├── services/
 │   │   ├── apiClient.ts        # axios 인스턴스, 베이스 URL, 인터셉터(토큰 주입, 401 처리)
@@ -374,7 +384,8 @@ frontend/
 │   │
 │   └── utils/
 │       ├── dateFormatter.ts    # ISO 8601 날짜 포맷 변환 유틸
-│       └── validators.ts       # 클라이언트 측 입력 유효성 검증 함수
+│       ├── validators.ts       # 클라이언트 측 입력 유효성 검증 함수
+│       └── calendar.ts         # 월 그리드 빌더, ISO 날짜 추출(extractIsoDate), shiftMonth
 │
 ├── public/
 ├── index.html

@@ -17,6 +17,8 @@ beforeEach(() => {
   useAuthStore.getState().clearAuth();
   apiMock.reset();
   apiMock.onGet('/users/me').reply(200, sampleUser);
+  apiMock.onGet('/categories').reply(200, { categories: [] });
+  apiMock.onGet('/todos').reply(200, { todos: [] });
 });
 
 function renderAt(path: string) {
@@ -56,13 +58,13 @@ describe('PrivateRoute (미인증)', () => {
 describe('PrivateRoute (인증)', () => {
   beforeEach(() => useAuthStore.getState().setAuth('jwt', sampleUser));
 
-  test('/ → 할일 목록', () => {
+  test('/ → 할일 목록', async () => {
     renderAt(ROUTES.HOME);
-    expect(screen.getByRole('heading', { name: '할일 목록' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '+ 새 할일' })).toBeInTheDocument();
   });
-  test('/categories → 카테고리', () => {
+  test('/categories → 카테고리', async () => {
     renderAt(ROUTES.CATEGORIES);
-    expect(screen.getByRole('heading', { name: '카테고리' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: '카테고리' })).toBeInTheDocument();
   });
   test('/profile → 프로필', async () => {
     renderAt(ROUTES.PROFILE);
@@ -73,13 +75,13 @@ describe('PrivateRoute (인증)', () => {
 describe('PublicRoute (인증 사용자 → / 리다이렉트)', () => {
   beforeEach(() => useAuthStore.getState().setAuth('jwt', sampleUser));
 
-  test('/login → 홈', () => {
+  test('/login → 홈', async () => {
     renderAt(ROUTES.LOGIN);
-    expect(screen.getByRole('heading', { name: '할일 목록' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '+ 새 할일' })).toBeInTheDocument();
   });
-  test('/register → 홈', () => {
+  test('/register → 홈', async () => {
     renderAt(ROUTES.REGISTER);
-    expect(screen.getByRole('heading', { name: '할일 목록' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '+ 새 할일' })).toBeInTheDocument();
   });
 });
 
@@ -99,10 +101,10 @@ describe('Catch-all', () => {
     renderAt('/unknown-path');
     expect(screen.getByRole('heading', { name: '로그인' })).toBeInTheDocument();
   });
-  test('인증 사용자가 알 수 없는 경로 → 홈', () => {
+  test('인증 사용자가 알 수 없는 경로 → 홈', async () => {
     useAuthStore.getState().setAuth('jwt', sampleUser);
     renderAt('/unknown-path');
-    expect(screen.getByRole('heading', { name: '할일 목록' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '+ 새 할일' })).toBeInTheDocument();
   });
 });
 

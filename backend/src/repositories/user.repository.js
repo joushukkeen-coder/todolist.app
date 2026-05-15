@@ -7,15 +7,22 @@ function toCamel(row) {
     email: row.email,
     name: row.name,
     authProvider: row.auth_provider,
+    darkMode: row.dark_mode,
+    language: row.language,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
+const SELECT_COLS =
+  'user_id, email, password_hash, name, auth_provider, dark_mode, language, created_at, updated_at';
+const RETURNING_COLS =
+  'user_id, email, name, auth_provider, dark_mode, language, created_at, updated_at';
+
 async function findByEmail(email) {
   const { rows } = await pool.query(
-    'SELECT user_id, email, password_hash, name, auth_provider, created_at, updated_at FROM users WHERE email = $1',
-    [email]
+    `SELECT ${SELECT_COLS} FROM users WHERE email = $1`,
+    [email],
   );
   if (rows.length === 0) return null;
   const user = toCamel(rows[0]);
@@ -27,16 +34,16 @@ async function insertOne({ email, passwordHash, name }) {
   const { rows } = await pool.query(
     `INSERT INTO users (email, password_hash, name, auth_provider)
      VALUES ($1, $2, $3, 'local')
-     RETURNING user_id, email, name, auth_provider, created_at, updated_at`,
-    [email, passwordHash, name]
+     RETURNING ${RETURNING_COLS}`,
+    [email, passwordHash, name],
   );
   return toCamel(rows[0]);
 }
 
 async function findById(userId) {
   const { rows } = await pool.query(
-    'SELECT user_id, email, password_hash, name, auth_provider, created_at, updated_at FROM users WHERE user_id = $1',
-    [userId]
+    `SELECT ${SELECT_COLS} FROM users WHERE user_id = $1`,
+    [userId],
   );
   if (rows.length === 0) return null;
   const user = toCamel(rows[0]);
@@ -48,7 +55,12 @@ async function updateById(userId, fields) {
   const setClauses = [];
   const values = [];
   let idx = 1;
-  const map = { name: 'name', passwordHash: 'password_hash' };
+  const map = {
+    name: 'name',
+    passwordHash: 'password_hash',
+    darkMode: 'dark_mode',
+    language: 'language',
+  };
   for (const [key, col] of Object.entries(map)) {
     if (fields[key] !== undefined) {
       setClauses.push(`${col} = $${idx++}`);
@@ -61,8 +73,8 @@ async function updateById(userId, fields) {
   values.push(userId);
   const { rows } = await pool.query(
     `UPDATE users SET ${setClauses.join(', ')} WHERE user_id = $${idx}
-     RETURNING user_id, email, name, auth_provider, created_at, updated_at`,
-    values
+     RETURNING ${RETURNING_COLS}`,
+    values,
   );
   if (rows.length === 0) return null;
   return toCamel(rows[0]);

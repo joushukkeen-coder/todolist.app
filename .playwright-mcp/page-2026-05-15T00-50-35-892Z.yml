@@ -1,0 +1,82 @@
+- generic [ref=e46]:
+  - banner [ref=e47]:
+    - generic [ref=e48]: TodoListApp
+    - generic [ref=e49]:
+      - generic [ref=e50]: 김철수
+      - combobox "언어 선택" [disabled] [ref=e51]:
+        - option "한국어" [selected]
+        - option "English"
+        - option "日本語"
+      - button "라이트 모드로 전환" [pressed] [ref=e346] [cursor=pointer]:
+        - generic [ref=e53]: ☀️ 라이트
+      - button "로그아웃" [ref=e54] [cursor=pointer]:
+        - generic [ref=e55]: 로그아웃
+  - generic [ref=e56]:
+    - navigation "주 메뉴" [ref=e57]:
+      - list [ref=e58]:
+        - listitem [ref=e59]:
+          - link "할일" [ref=e60] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e61]:
+          - link "카테고리" [ref=e62] [cursor=pointer]:
+            - /url: /categories
+        - listitem [ref=e63]:
+          - link "프로필" [ref=e64] [cursor=pointer]:
+            - /url: /profile
+    - main [ref=e65]:
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - heading "할일 목록" [level=1] [ref=e146]
+          - button "+ 새 할일" [ref=e147] [cursor=pointer]:
+            - generic [ref=e148]: + 새 할일
+        - generic [ref=e149]:
+          - complementary [ref=e150]:
+            - generic [ref=e151]:
+              - heading "필터" [level=2] [ref=e152]
+              - button "초기화" [ref=e153] [cursor=pointer]:
+                - generic [ref=e154]: 초기화
+            - generic [ref=e155]:
+              - generic [ref=e156]: 카테고리
+              - combobox "카테고리" [ref=e157]:
+                - option "전체" [selected]
+                - option "개인"
+                - option "쇼핑"
+                - option "업무"
+                - option "프로젝트 관리"
+            - radiogroup "완료 여부" [ref=e158]:
+              - generic [ref=e159]: 완료 여부
+              - generic [ref=e160]:
+                - generic [ref=e161] [cursor=pointer]:
+                  - radio "전체" [checked]
+                  - generic [ref=e162]: 전체
+                - generic [ref=e163] [cursor=pointer]:
+                  - radio "미완료"
+                  - generic [ref=e164]: 미완료
+                - generic [ref=e165] [cursor=pointer]:
+                  - radio "완료"
+                  - generic [ref=e166]: 완료
+            - generic [ref=e167]:
+              - generic [ref=e168]: 기간 (종료예정일)
+              - generic [ref=e169]:
+                - textbox "시작일" [ref=e170]
+                - generic [ref=e171]: ~
+                - textbox "종료일" [ref=e172]
+          - generic [ref=e173]:
+            - article [ref=e279]:
+              - checkbox "완료 처리" [ref=e281] [cursor=pointer]
+              - generic [ref=e282]:
+                - heading "팀 미팅 참석" [level=3] [ref=e283]
+                - generic [ref=e284]:
+                  - generic [ref=e285]: 업무
+                  - generic [ref=e287]: ~2026-05-14T15:00:00.000Z
+              - button "수정" [ref=e288] [cursor=pointer]
+              - button "삭제" [ref=e289] [cursor=pointer]
+            - article [ref=e300]:
+              - checkbox "완료 처리" [ref=e302] [cursor=pointer]
+              - generic [ref=e303]:
+                - heading "Q2 기획서 및 발표 준비" [level=3] [ref=e334]
+                - generic [ref=e305]:
+                  - generic [ref=e306]: 프로젝트 관리
+                  - generic [ref=e308]: ~2026-05-28T15:00:00.000Z
+              - button "수정" [ref=e309] [cursor=pointer]
+              - button "삭제" [ref=e310] [cursor=pointer]

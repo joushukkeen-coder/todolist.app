@@ -1,0 +1,44 @@
+- generic [ref=e16]:
+  - banner [ref=e17]:
+    - generic [ref=e18]: TodoListApp
+    - generic [ref=e19]:
+      - generic [ref=e20]: 김철수
+      - combobox "언어 선택" [ref=e21]:
+        - option "한국어" [selected]
+        - option "English"
+        - option "日本語"
+      - button "다크 모드로 전환" [ref=e22] [cursor=pointer]:
+        - generic [ref=e23]: 🌙 다크
+      - button "로그아웃" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 로그아웃
+  - generic [ref=e26]:
+    - navigation "주 메뉴" [ref=e27]:
+      - list [ref=e28]:
+        - listitem [ref=e29]:
+          - link "할일" [ref=e30] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e31]:
+          - link "카테고리" [ref=e32] [cursor=pointer]:
+            - /url: /categories
+        - listitem [ref=e33]:
+          - link "프로필" [ref=e34] [cursor=pointer]:
+            - /url: /profile
+    - main [ref=e35]:
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - heading "카테고리" [level=1] [ref=e186]
+          - button "+ 새 카테고리" [ref=e187] [cursor=pointer]:
+            - generic [ref=e188]: + 새 카테고리
+        - heading "기본 카테고리" [level=2] [ref=e189]
+        - list [ref=e190]:
+          - listitem [ref=e191]:
+            - generic [ref=e192]: 개인
+            - generic [ref=e194]: (기본 - 수정/삭제 불가)
+          - listitem [ref=e195]:
+            - generic [ref=e196]: 쇼핑
+            - generic [ref=e198]: (기본 - 수정/삭제 불가)
+          - listitem [ref=e199]:
+            - generic [ref=e200]: 업무
+            - generic [ref=e202]: (기본 - 수정/삭제 불가)
+        - heading "내 카테고리" [level=2] [ref=e203]
+        - paragraph [ref=e204]: 아직 카테고리가 없습니다.

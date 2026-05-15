@@ -1,7 +1,8 @@
 # 프론트엔드 ↔ 백엔드 통합 가이드
 
-> 버전: 1.0.0
+> 버전: 1.3.0
 > 작성일: 2026-05-14
+> 최종 수정: 2026-05-15
 > 참조: docs/2-prd.md, docs/4-project-principles.md, swagger/swagger.json
 
 이 문서는 React 프론트엔드(`frontend/`)가 Node.js + Express 백엔드(`backend/`)와 통합되는 방식을 정리한다. 새 화면을 만들거나 API를 호출할 때 이 문서를 출발점으로 사용한다.
@@ -97,6 +98,94 @@ apiClient.interceptors.response.use(
 
 이 처리 덕분에 개별 호출처에서는 401을 신경 쓰지 않아도 된다.
 
+### 3.4 다크 모드 (사용자별 영속)
+
+JWT 메모리 정책상 `localStorage`를 못 쓰지만 다크 모드 선호는 새로고침·재로그인 후에도 보존돼야 한다. 사용자별 설정이므로 서버 `users.dark_mode` 컬럼에 저장하고, 응답 흐름에 포함해서 클라이언트가 자동으로 받게 한다.
+
+흐름:
+
+```
+POST /auth/login  →  { accessToken, user: { ..., darkMode: true } }
+                       │
+                       ▼
+              authStore.setAuth(token, user)
+                       │
+                       ▼
+       <AppLayout>에서 useApplyDarkMode() 호출
+                       │
+                       ▼
+        document.documentElement.setAttribute('data-theme', 'dark')
+                       │
+                       ▼
+        styles/tokens.css의 [data-theme='dark'] 색 토큰이 활성
+```
+
+토글:
+
+- Header의 "🌙 다크" / "☀️ 라이트" 버튼이 `useToggleDarkMode().mutate(!current)` 호출
+- 서비스: `userApi.updateProfile({ darkMode })` → `PATCH /api/v1/users/me`
+- 성공 시 `authStore.setAuth(token, { ...user, darkMode })`로 즉시 갱신 → DOM 반영
+- 다음 로그인 시 응답에 같은 값이 내려와 자동 복원
+
+스타일 토큰만 갈아끼우는 구조라 컴포넌트 코드는 다크/라이트를 의식하지 않는다. 새 색을 쓸 때는 항상 `var(--color-*)`를 참조한다 (HEX 직접 작성 금지).
+
+### 3.5 다국어 (사용자별 영속)
+
+다크 모드와 같은 패턴. `users.language` 컬럼(VARCHAR(2), CHECK ko/en/ja, DEFAULT 'ko')에 사용자별 선호 언어를 저장하고 로그인·`GET /users/me` 응답에 포함시킨다.
+
+흐름:
+
+```
+POST /auth/login  →  { accessToken, user: { ..., language: 'en' } }
+                       │
+                       ▼
+              authStore.setAuth(token, user)
+                       │
+                       ▼
+       <AppLayout>에서 useApplyLanguage() 호출
+                       │
+                       ▼
+        document.documentElement.setAttribute('lang', 'en')
+                       │
+                       ▼
+        컴포넌트가 useTranslation().t(key)로 사전 lookup
+```
+
+번역 사전: `frontend/src/i18n/messages.ts`에 `MESSAGES: Record<Language, Record<string, string>>` 형태로 ko/en/ja 3개 언어를 보관. 키 누락 시 영문 코드(키 자체)를 그대로 반환하여 누락이 즉시 눈에 띈다.
+
+변경 흐름:
+
+- Header의 `<select>`(ko/en/ja)가 `useChangeLanguage().mutate(lang)` 호출
+- 서비스: `userApi.updateProfile({ language })` → `PATCH /api/v1/users/me`
+- 성공 시 `authStore.setAuth(token, { ...user, language })`로 즉시 갱신 → 모든 `useTranslation` 훅이 새 언어 반환 → 화면 전체 즉시 재번역
+- 다음 로그인 시 응답에 같은 값이 내려와 자동 복원
+
+외부 라이브러리(react-i18next 등) 미사용 — 키 50개 안팎 수준에서는 단순 사전이 더 가볍고 명시적이다. 향후 ICU 메시지 포맷·복수형이 필요해지면 그때 라이브러리 도입을 검토한다.
+
+### 3.6 메인 캘린더 뷰 (v1.3.0~)
+
+`HomePage`는 카드 리스트 + 필터 패널 구조에서 월간 캘린더(`TodoCalendar`)로 전환되었다.
+
+데이터 흐름:
+
+```
+HomePage
+  ├── useTodos({})              ← 필터 없이 전체 할일 조회
+  ├── 월 단위 state (year, month)
+  └── <TodoCalendar year month todos onCellClick onTodoClick />
+        │
+        ├── buildMonthGrid(year, month)   ← 42셀 (6주 × 7일)
+        └── 각 todo의 extractIsoDate(t.dueDate)로 셀에 그룹핑
+```
+
+- **타임스탬프 호환**: 백엔드가 `dueDate`를 TIMESTAMP로 응답해도(`2026-05-29T15:00:00.000Z`) `extractIsoDate`의 정규식 `^(\d{4}-\d{2}-\d{2})`로 날짜 부분만 매칭. 향후 백엔드 컬럼을 `DATE`로 정리하면 변환 단계가 사라진다.
+- **인터랙션**:
+  - 빈 셀 클릭 → `openCreate(isoDate)` → 등록 모달의 종료예정일 자동 입력
+  - 할일 제목 클릭 → `openEdit(todo)` → 수정 모달 (이벤트가 셀로 버블되지 않도록 `stopPropagation`)
+  - `‹` / `›` / `오늘` 버튼으로 `year`·`month` 상태 갱신 → 같은 `todos` 데이터를 다른 달로 재그룹핑
+- **필터 UI 미노출**: 카테고리·완료 여부 복합 필터는 캘린더 뷰에서 잠시 제거 (PRD §3.3 US-T-07 — 후속 작업으로 캘린더 상단 컴팩트 바 검토).
+- **할일 0건 처리**: 빈 상태 안내 문구 대신 빈 캘린더 그대로 표시. 사용자는 `+ 새 할일` 또는 빈 셀 클릭으로 즉시 등록 가능.
+
 ---
 
 ## 4. API 클라이언트 사용 패턴
@@ -143,7 +232,7 @@ React 컴포넌트
 | 메서드 | 경로 | 인증 | FE 서비스 | 비고 |
 |---|---|---|---|---|
 | GET | `/users/me` | ✓ | `userApi.getMe` | 200 → User |
-| PATCH | `/users/me` | ✓ | `userApi.updateProfile` | 이름 변경. `email` 변경 시 400 `EMAIL_CHANGE_NOT_ALLOWED` |
+| PATCH | `/users/me` | ✓ | `userApi.updateProfile` | 이름·다크 모드·언어 변경 (`{ name?, darkMode?, language? }`). `language`는 `ko`/`en`/`ja`. `email` 변경 시 400 `EMAIL_CHANGE_NOT_ALLOWED` |
 | PATCH | `/users/me/password` | ✓ | `userApi.changePassword` | 204. 본문: `{ currentPassword, newPassword }` |
 | DELETE | `/users/me` | ✓ | `userApi.deleteAccount` | 204 |
 
@@ -293,3 +382,6 @@ npm run dev          # Vite (포트 5173)
 | 버전 | 날짜 | 변경 내용 |
 |---|---|---|
 | 1.0.0 | 2026-05-14 | 초판 작성. 현 구현 기준(로깅·Swagger UI·`PATCH /users/me/password`·`CORS_ORIGIN` 분리 포함) |
+| 1.1.0 | 2026-05-15 | 다크 모드: User 응답에 `darkMode` 포함, `PATCH /users/me { darkMode }`, `useApplyDarkMode`/`useToggleDarkMode` 훅, Header 토글 버튼, `<html data-theme="dark">` 적용 |
+| 1.2.0 | 2026-05-15 | 다국어: User 응답에 `language` (ko/en/ja), `PATCH /users/me { language }`, `useApplyLanguage`/`useTranslation`/`useChangeLanguage` 훅, Header 셀렉터, `<html lang="...">` + 경량 사전 |
+| 1.3.0 | 2026-05-15 | 메인 캘린더 뷰 도입. `HomePage`가 `useTodos({})` 전체 조회 + 클라이언트 측 `extractIsoDate`로 dueDate 그룹핑 → `TodoCalendar` 렌더. 카테고리/완료 여부 필터 UI는 비노출(후속) |

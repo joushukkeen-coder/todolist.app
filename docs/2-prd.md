@@ -1,7 +1,8 @@
 # TodoListApp PRD (Product Requirements Document)
 
-> 버전: 1.0.0
+> 버전: 1.3.0
 > 작성일: 2026-05-13
+> 최종 수정: 2026-05-15
 > 상태: 초안 (Draft)
 > 참조: [도메인 정의서 v1.0.0](./1-domain-definition.md)
 
@@ -14,6 +15,9 @@
 | 1.0.0 | 2026-05-13 | joushukkeen | 최초 작성 (도메인 정의서 기반 PRD 초안) |
 | 1.0.1 | 2026-05-13 | joushukkeen | 도메인 정의서 검토 반영: 비밀번호 최소 8자 조건 추가, 제목 길이 제한(1~200자) 명시, 기간 필터 제외 조건 명시 |
 | 1.0.2 | 2026-05-13 | joushukkeen | JWT 토큰 저장 방식 명시: Zustand authStore 메모리 저장, localStorage·Cookie 사용 금지 |
+| 1.1.0 | 2026-05-15 | joushukkeen | 다크 모드 v1으로 승격: `users.dark_mode` 컬럼 추가, `PATCH /users/me { darkMode }` 토글, Header 버튼 |
+| 1.2.0 | 2026-05-15 | joushukkeen | 다국어(ko/en/ja) v1으로 승격: `users.language` 컬럼 + CHECK 제약, `PATCH /users/me { language }` 변경, Header 셀렉터, 경량 사전(`i18n/messages.ts`) 기반 |
+| 1.3.0 | 2026-05-15 | joushukkeen | 메인 화면을 월간 캘린더 뷰로 전환 (`TodoCalendar` 컴포넌트). 카드 리스트 + 필터 패널은 캘린더가 대체하며, 카테고리·완료 여부 필터 UI는 후속 확장 항목으로 이관 |
 
 ---
 
@@ -35,8 +39,8 @@
 |------|----------|-----------|
 | 인증 | JWT 기반 이메일/비밀번호 | OAuth Social (Google, Facebook 등) |
 | 플랫폼 | 반응형 웹 (Web + Mobile Web) | 네이티브 앱 검토 |
-| UI 테마 | 라이트 모드 단일 | 다크 모드 추가 |
-| 언어 | 한국어 단일 | 다국어 지원 (i18n) |
+| UI 테마 | 라이트 + 다크 (사용자별 토글, DB 영속) | 시스템 테마 자동 감지·테마 커스터마이즈 |
+| 언어 | 한국어·영어·일본어 3개 선택 (사용자별 토글, DB 영속) | 다국어 확장 (중국어 등), 자동 감지 |
 
 ---
 
@@ -242,15 +246,15 @@ v2 (확장)
 | 화면 | 설명 |
 |------|------|
 | 로그인 / 회원가입 | 인증 전 진입점, 비인증 시 리다이렉트 |
-| 할일 목록 | 필터 패널 + 할일 카드 리스트, 빠른 완료 토글 |
+| 할일 캘린더 (메인) | 월간 그리드 (일~토), 셀당 dueDate 매칭 할일 제목 표시. 빈 셀 클릭→등록, 할일 클릭→수정. 이전/다음/오늘 네비게이션 |
 | 할일 등록/수정 | 모달 또는 슬라이드 패널 |
 | 카테고리 관리 | 기본/사용자 정의 카테고리 목록, CRUD |
 | 프로필 설정 | 이름·비밀번호 변경, 회원 탈퇴 |
 
 ### 7.3 v2 확장 예약 항목
 
-- 다크 모드
-- 다국어 지원 (i18n, 한국어 → 영어 우선)
+- 시스템 테마(`prefers-color-scheme`) 자동 감지 옵션
+- 다국어 확장 (중국어 등 추가 언어, 브라우저 `navigator.language` 자동 감지)
 
 ---
 
@@ -264,12 +268,13 @@ v2 (확장)
 - [x] 할일 CRUD + 완료·완료 취소 처리
 - [x] 할일 필터링 (카테고리·기간·완료 여부)
 - [x] 반응형 웹 UI (PC + Mobile Web)
+- [x] 다크 모드 토글 (사용자별 설정, DB 영속)
+- [x] 다국어 선택 (한국어/영어/일본어, 사용자별 설정, DB 영속)
 
 ### 8.2 v2 후순위 항목
 
 - [ ] OAuth Social 로그인 (Google, Facebook)
-- [ ] 다크 모드
-- [ ] 다국어 지원 (i18n)
+- [ ] 다국어 확장 (지원 언어 추가, 브라우저 자동 감지)
 - [ ] 수평 확장 인프라 (로드 밸런서, 다중 인스턴스)
 
 ### 8.3 개발 일정 (3일)
@@ -288,7 +293,7 @@ v2 (확장)
 
 | 테이블 | 주요 컬럼 | 비고 |
 |--------|-----------|------|
-| `users` | `user_id UUID PK`, `email`, `password_hash`, `name`, `created_at`, `updated_at` | 이메일 UNIQUE |
+| `users` | `user_id UUID PK`, `email`, `password_hash`, `name`, `dark_mode`, `language`, `created_at`, `updated_at` | 이메일 UNIQUE. `dark_mode`는 사용자별 UI 테마(BOOLEAN, DEFAULT FALSE), `language`는 UI 언어(VARCHAR(2), DEFAULT 'ko', CHECK ko/en/ja) |
 | `categories` | `category_id UUID PK`, `user_id UUID FK NULL`, `name`, `color_code`, `is_default BOOL`, `created_at` | `user_id NULL` = 기본 카테고리 |
 | `todos` | `todo_id UUID PK`, `user_id UUID FK`, `category_id UUID FK`, `title`, `description`, `due_date`, `is_completed BOOL`, `completed_at`, `created_at`, `updated_at` | |
 

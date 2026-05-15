@@ -1,7 +1,11 @@
+export type Language = 'ko' | 'en' | 'ja';
+
 export interface User {
   userId: string;
   email: string;
   name: string;
+  darkMode?: boolean;
+  language?: Language;
   createdAt: string;
   updatedAt?: string;
 }

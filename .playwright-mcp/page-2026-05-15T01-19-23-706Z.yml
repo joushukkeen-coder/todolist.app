@@ -1,0 +1,174 @@
+- generic [ref=e33]:
+  - banner [ref=e34]:
+    - generic [ref=e35]: TodoListApp
+    - generic [ref=e36]:
+      - generic [ref=e37]: 김철수
+      - combobox "언어 선택" [ref=e38]:
+        - option "한국어" [selected]
+        - option "English"
+        - option "日本語"
+      - button "다크 모드로 전환" [ref=e39] [cursor=pointer]:
+        - generic [ref=e40]: 🌙 다크
+      - button "로그아웃" [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: 로그아웃
+  - generic [ref=e43]:
+    - navigation "주 메뉴" [ref=e44]:
+      - list [ref=e45]:
+        - listitem [ref=e46]:
+          - link "할일" [ref=e47] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e48]:
+          - link "카테고리" [ref=e49] [cursor=pointer]:
+            - /url: /categories
+        - listitem [ref=e50]:
+          - link "프로필" [ref=e51] [cursor=pointer]:
+            - /url: /profile
+    - main [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - button "이전 달" [ref=e56] [cursor=pointer]:
+              - generic [ref=e57]: ‹
+            - heading "2026.05" [level=1] [ref=e58]
+            - button "다음 달" [ref=e59] [cursor=pointer]:
+              - generic [ref=e60]: ›
+            - button "오늘" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: 오늘
+          - button "+ 새 할일" [ref=e63] [cursor=pointer]:
+            - generic [ref=e64]: + 새 할일
+        - grid "할일 캘린더" [ref=e65]:
+          - row "일 월 화 수 목 금 토" [ref=e66]:
+            - columnheader "일" [ref=e67]
+            - columnheader "월" [ref=e68]
+            - columnheader "화" [ref=e69]
+            - columnheader "수" [ref=e70]
+            - columnheader "목" [ref=e71]
+            - columnheader "금" [ref=e72]
+            - columnheader "토" [ref=e73]
+          - generic [ref=e74]:
+            - gridcell "2026-04-26" [ref=e75] [cursor=pointer]:
+              - generic [ref=e76]: "26"
+              - list [ref=e77]
+            - gridcell "2026-04-27" [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]: "27"
+              - list [ref=e80]
+            - gridcell "2026-04-28" [ref=e81] [cursor=pointer]:
+              - generic [ref=e82]: "28"
+              - list [ref=e83]
+            - gridcell "2026-04-29" [ref=e84] [cursor=pointer]:
+              - generic [ref=e85]: "29"
+              - list [ref=e86]
+            - gridcell "2026-04-30" [ref=e87] [cursor=pointer]:
+              - generic [ref=e88]: "30"
+              - list [ref=e89]
+            - gridcell "2026-05-01" [ref=e90] [cursor=pointer]:
+              - generic [ref=e91]: "1"
+              - list [ref=e92]
+            - gridcell "2026-05-02" [ref=e93] [cursor=pointer]:
+              - generic [ref=e94]: "2"
+              - list [ref=e95]
+            - gridcell "2026-05-03" [ref=e96] [cursor=pointer]:
+              - generic [ref=e97]: "3"
+              - list [ref=e98]
+            - gridcell "2026-05-04" [ref=e99] [cursor=pointer]:
+              - generic [ref=e100]: "4"
+              - list [ref=e101]
+            - gridcell "2026-05-05" [ref=e102] [cursor=pointer]:
+              - generic [ref=e103]: "5"
+              - list [ref=e104]
+            - gridcell "2026-05-06" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]: "6"
+              - list [ref=e107]
+            - gridcell "2026-05-07" [ref=e108] [cursor=pointer]:
+              - generic [ref=e109]: "7"
+              - list [ref=e110]
+            - gridcell "2026-05-08" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: "8"
+              - list [ref=e113]
+            - gridcell "2026-05-09" [ref=e114] [cursor=pointer]:
+              - generic [ref=e115]: "9"
+              - list [ref=e116]
+            - gridcell "2026-05-10" [ref=e117] [cursor=pointer]:
+              - generic [ref=e118]: "10"
+              - list [ref=e119]
+            - gridcell "2026-05-11" [ref=e120] [cursor=pointer]:
+              - generic [ref=e121]: "11"
+              - list [ref=e122]
+            - gridcell "2026-05-12" [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]: "12"
+              - list [ref=e125]
+            - gridcell "2026-05-13" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: "13"
+              - list [ref=e128]
+            - gridcell "2026-05-14" [ref=e129] [cursor=pointer]:
+              - generic [ref=e130]: "14"
+              - list [ref=e131]
+            - gridcell "2026-05-15" [ref=e132] [cursor=pointer]:
+              - generic [ref=e133]: "15"
+              - list [ref=e134]
+            - gridcell "2026-05-16" [ref=e135] [cursor=pointer]:
+              - generic [ref=e136]: "16"
+              - list [ref=e137]
+            - gridcell "2026-05-17" [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]: "17"
+              - list [ref=e140]
+            - gridcell "2026-05-18" [ref=e141] [cursor=pointer]:
+              - generic [ref=e142]: "18"
+              - list [ref=e143]
+            - gridcell "2026-05-19" [ref=e144] [cursor=pointer]:
+              - generic [ref=e145]: "19"
+              - list [ref=e146]
+            - gridcell "2026-05-20" [ref=e147] [cursor=pointer]:
+              - generic [ref=e148]: "20"
+              - list [ref=e149]
+            - gridcell "2026-05-21" [ref=e150] [cursor=pointer]:
+              - generic [ref=e151]: "21"
+              - list [ref=e152]
+            - gridcell "2026-05-22" [ref=e153] [cursor=pointer]:
+              - generic [ref=e154]: "22"
+              - list [ref=e155]
+            - gridcell "2026-05-23" [ref=e156] [cursor=pointer]:
+              - generic [ref=e157]: "23"
+              - list [ref=e158]
+            - gridcell "2026-05-24" [ref=e159] [cursor=pointer]:
+              - generic [ref=e160]: "24"
+              - list [ref=e161]
+            - gridcell "2026-05-25" [ref=e162] [cursor=pointer]:
+              - generic [ref=e163]: "25"
+              - list [ref=e164]
+            - gridcell "2026-05-26" [ref=e165] [cursor=pointer]:
+              - generic [ref=e166]: "26"
+              - list [ref=e167]
+            - gridcell "2026-05-27" [ref=e168] [cursor=pointer]:
+              - generic [ref=e169]: "27"
+              - list [ref=e170]
+            - gridcell "2026-05-28" [ref=e171] [cursor=pointer]:
+              - generic [ref=e172]: "28"
+              - list [ref=e173]
+            - gridcell "2026-05-29" [ref=e174] [cursor=pointer]:
+              - generic [ref=e175]: "29"
+              - list [ref=e176]
+            - gridcell "2026-05-30" [ref=e177] [cursor=pointer]:
+              - generic [ref=e178]: "30"
+              - list [ref=e179]
+            - gridcell "2026-05-31" [ref=e180] [cursor=pointer]:
+              - generic [ref=e181]: "31"
+              - list [ref=e182]
+            - gridcell "2026-06-01" [ref=e183] [cursor=pointer]:
+              - generic [ref=e184]: "1"
+              - list [ref=e185]
+            - gridcell "2026-06-02" [ref=e186] [cursor=pointer]:
+              - generic [ref=e187]: "2"
+              - list [ref=e188]
+            - gridcell "2026-06-03" [ref=e189] [cursor=pointer]:
+              - generic [ref=e190]: "3"
+              - list [ref=e191]
+            - gridcell "2026-06-04" [ref=e192] [cursor=pointer]:
+              - generic [ref=e193]: "4"
+              - list [ref=e194]
+            - gridcell "2026-06-05" [ref=e195] [cursor=pointer]:
+              - generic [ref=e196]: "5"
+              - list [ref=e197]
+            - gridcell "2026-06-06" [ref=e198] [cursor=pointer]:
+              - generic [ref=e199]: "6"
+              - list [ref=e200]

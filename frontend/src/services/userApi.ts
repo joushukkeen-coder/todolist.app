@@ -1,12 +1,16 @@
 import { apiClient } from './apiClient';
-import type { User } from '@/types/auth.types';
+import type { Language, User } from '@/types/auth.types';
 
 export async function getMe(): Promise<User> {
   const { data } = await apiClient.get<User>('/users/me');
   return data;
 }
 
-export async function updateProfile(payload: { name: string }): Promise<User> {
+export async function updateProfile(payload: {
+  name?: string;
+  darkMode?: boolean;
+  language?: Language;
+}): Promise<User> {
   const { data } = await apiClient.patch<User>('/users/me', payload);
   return data;
 }

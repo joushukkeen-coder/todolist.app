@@ -3,11 +3,18 @@ const { hashPassword, comparePassword } = require('../utils/hash');
 const userRepository = require('../repositories/user.repository');
 const logger = require('../utils/logger');
 
-async function updateProfile(userId, { email, name, currentPassword, newPassword }) {
+const SUPPORTED_LANGUAGES = ['ko', 'en', 'ja'];
+
+async function updateProfile(
+  userId,
+  { email, name, currentPassword, newPassword, darkMode, language },
+) {
   logger.info('user.service', 'updateProfile requested', {
     userId,
     nameChanged: name !== undefined,
     passwordChange: newPassword !== undefined,
+    darkModeChanged: darkMode !== undefined,
+    languageChanged: language !== undefined,
   });
   if (email !== undefined) {
     logger.warn('user.service', 'email change attempt blocked', { userId });
@@ -16,6 +23,22 @@ async function updateProfile(userId, { email, name, currentPassword, newPassword
 
   const fields = {};
   if (name !== undefined) fields.name = name;
+  if (darkMode !== undefined) {
+    if (typeof darkMode !== 'boolean') {
+      throw new AppError('VALIDATION_ERROR', 400, 'darkMode는 boolean이어야 합니다');
+    }
+    fields.darkMode = darkMode;
+  }
+  if (language !== undefined) {
+    if (!SUPPORTED_LANGUAGES.includes(language)) {
+      throw new AppError(
+        'VALIDATION_ERROR',
+        400,
+        `language는 ${SUPPORTED_LANGUAGES.join(', ')} 중 하나여야 합니다`,
+      );
+    }
+    fields.language = language;
+  }
 
   if (newPassword !== undefined) {
     if (newPassword.length < 8) {

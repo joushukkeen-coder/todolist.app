@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   return (
     <section className="auth-page">
-      <h1>로그인</h1>
+      <h1>할일 목록 앱</h1>
       <form onSubmit={handleSubmit} noValidate className="auth-page__form">
         <Input
           label="이메일"
